@@ -8,11 +8,11 @@ $ git clone git@github.com:artemkolba321-spec/OLS.git
 $ cd OLS
 ```
 next initialization
-if Bash
+- if Bash
 ```Bash
 $ bash ./init.sh
 ```
-if Zsh
+- if Zsh
 ```Bash
 $ zsh ./init.sh
 ```
