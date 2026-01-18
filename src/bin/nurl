@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# OLS command: nurl
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# ===== Paths =====
+OLS_DIR="$HOME/OLS"
+LOG_FILE="$OLS_DIR/logs.log"
+
+# ===== Logging =====
+ols_log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][nurl] $*" >> "$LOG_FILE"
+}
+
+die() {
+    echo "nurl: $@" >&2
+    ols_log "ERROR: $@"
+    exit 1
+}
+
+# ===== Helpers =====
+show_help() {
+    cat <<'EOF'
+nurl - Net URL Load
+
+usage:
+	nurl <URL>
+examples:
+    nurl https://example.com/file.zip
+    nurl https://example.com/ > index.html
+    nurl https://example.com/ | less
+EOF
+}
+
+# ===== Args =====
+[[ $# -eq 0 ]] && show_help && exit 0
+command -v wget >/dev/null 2>&1 || die "wget not found"
+
+# ===== Main =====
+case "$1" in
+    --help)
+        show_help
+        exit 0
+        ;;
+    *)
+        if [[ "$1" == http://* || "$1" == https://* ]]; then
+            wget "$1"
+            ols_log "fetch $1"
+        else
+            die "invalid argument: $1"
+        fi
+        ;;
+esac

@@ -1,0 +1,211 @@
+#!/usr/bin/env bash
+# Open Linux Shell (OLS)
+
+set -u
+IFS=$'\n\t'
+
+# ===== Paths =====
+OLS_DIR="${OLS_DIR:-$HOME/OLS}"
+BIN_DIR="${BIN_DIR:-$OLS_DIR/bin}"
+LOG_FILE="${LOG_FILE:-$OLS_DIR/logs.log}"
+
+# ===== Logging =====
+ols_log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS] $*" >> "$LOG_FILE"
+}
+
+die() {
+    echo "Error: $*" >&2
+    ols_log "ERROR: $*"
+    exit 1
+}
+
+# ===== Help =====
+show_help() {
+    cat <<'EOF'
+Open Linux Shell (OLS)
+
+usage:
+    ols              — start interactive shell
+    ols help         — show help
+    ols doctor       — check OLS installation
+    ols update       — update OLS from official repository
+
+interactive:
+    bash:<plugin>    — run bash plugin
+EOF
+}
+
+# ===== Doctor =====
+ols_doctor() {
+    echo "OLS Doctor report"
+    echo "------------------"
+
+    # ===== Counters =====
+    ok_count=0
+    warn_count=0
+    fail_count=0
+
+    # ===== Checked paths to avoid duplicates =====
+    declare -A checked
+
+    # ===== Universal check function =====
+    check() {
+        local type="$1"
+        local target="$2"
+
+        # empty target
+        [[ -z "$target" ]] && { echo "[WARN] Empty target for type: $type"; ((warn_count++)); return; }
+
+        # normalize path for dirs/files
+        if [[ "$type" == "dir" || "$type" == "file" ]]; then
+            target=$(realpath -m "$target")
+        fi
+
+        # skip if already checked
+        [[ -n "${checked[$target]+_}" ]] && return
+        checked[$target]=1
+
+        # ===== Check by type =====
+        case "$type" in
+            dir)
+                if [[ -d "$target" ]]; then
+                    echo "[OK]     Directory: $target"
+                    ((ok_count++))
+                else
+                    echo "[FAIL]   Directory missing: $target"
+                    ((fail_count++))
+                fi
+                ;;
+            file)
+                if [[ -f "$target" ]]; then
+                    echo "[OK]     File: $target"
+                    ((ok_count++))
+                else
+                    echo "[FAIL]   File missing: $target"
+                    ((fail_count++))
+                fi
+                ;;
+            cmd)
+                if command -v "$target" >/dev/null 2>&1; then
+                    echo "[OK]     Command: $target"
+                    ((ok_count++))
+                else
+                    echo "[FAIL]   Command missing: $target"
+                    ((fail_count++))
+                fi
+                ;;
+            *)
+                echo "[WARN] Unknown check type: $type"
+                ((warn_count++))
+                ;;
+        esac
+    }
+
+    # ===== Paths & dependencies =====
+    OLS_DIR="${OLS_DIR:-$HOME/OLS}"
+    BIN_DIR="${BIN_DIR:-$OLS_DIR/bin}"
+    LOG_FILE="${LOG_FILE:-$OLS_DIR/logs.log}"
+
+    SYSTEM_DIRS=("$OLS_DIR" "$BIN_DIR")
+    SYSTEM_FILES=("$LOG_FILE" "$HOME/.olsrc")
+    DEPENDENCIES=(git wget bash tar touch mkdir)
+
+    # ===== Check directories =====
+    for dir in "${SYSTEM_DIRS[@]}"; do
+        check dir "$dir"
+    done
+
+    # ===== Check files =====
+    for file in "${SYSTEM_FILES[@]}"; do
+        check file "$file"
+    done
+
+    # ===== Check commands =====
+    for cmd in "${DEPENDENCIES[@]}"; do
+        check cmd "$cmd"
+    done
+
+    # ===== Summary =====
+    echo
+    echo "Summary:"
+    echo "  OK: $ok_count"
+    echo "  WARN: $warn_count"
+    echo "  FAIL: $fail_count"
+}
+
+
+# ===== Update =====
+ols_update() {
+    command -v git >/dev/null 2>&1 || die "Git not found"
+
+    if [[ ! -d "$OLS_DIR/.git" ]]; then
+        die "OLS directory is not a git repository"
+    fi
+
+    echo "Updating OLS..."
+    ols_log "OLS update started"
+
+    if git -C "$OLS_DIR" pull --ff-only; then
+        echo "OLS updated successfully"
+        ols_log "OLS update successful"
+    else
+        die "Failed to update OLS"
+    fi
+}
+
+# ===== Interactive shell =====
+interactive_shell() {
+    ols_log "Interactive shell started"
+    echo "Welcome to OLS! (help — show help, exit — quit)"
+
+    while true; do
+        read -rp "ols> " cmd args || break
+
+        case "$cmd" in
+            exit)
+                ols_log "Shell exited"
+                echo "Goodbye!"
+                break
+                ;;
+            help)
+                show_help
+                ;;
+            bash:*)
+                plugin="${cmd#bash:}"
+                if declare -f "$plugin" >/dev/null 2>&1; then
+                    "$plugin" $args
+                    ols_log "Plugin executed: $plugin $args"
+                else
+                    echo "Bash plugin not found: $plugin"
+                    ols_log "Plugin missing: $plugin"
+                fi
+                ;;
+            "")
+                ;;
+            *)
+                echo "Unknown command: $cmd"
+                ols_log "Unknown command: $cmd $args"
+                ;;
+        esac
+    done
+}
+
+# ===== Main =====
+case "${1-}" in
+    help|--help)
+        show_help
+        ;;
+    doctor)
+        ols_doctor
+        ;;
+    update)
+        ols_update
+        ;;
+    "")
+        interactive_shell
+        ;;
+    *)
+        die "Unknown command: $1"
+        ;;
+esac

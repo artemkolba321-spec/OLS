@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+USER_NAME="$USER"
+HOST_NAME="${HOSTNAME:-$(hostnamectl status --pretty 2>/dev/null || hostname 2>/dev/null || cat /etc/hostname 2>/dev/null || echo 'Unknown')}"
+OS_NAME="$(lsb_release -ds 2>/dev/null || uname -s)"
+KERNEL="$(uname -r)"
+UPTIME="$(uptime -p | sed 's/up //')"
+SHELL_NAME="$(basename "$SHELL")"
+CPU="$(lscpu 2>/dev/null | awk -F: '/Model name/ {print $2}' | sed 's/^[ \t]*//')"
+GPU="$(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null || \
+      glxinfo 2>/dev/null | grep 'OpenGL renderer' | awk -F: '{print $2}' | xargs || \
+      lspci | grep -i 'vga\|3d\|2d' | awk -F: '{print $3}' | xargs || \
+      echo 'Unknown')"
+
+
+echo -e "\e[1;34mXSystem Info\e[0m"
+echo "User:   $USER_NAME"
+echo "Host:   $HOST_NAME"
+echo "OS:     $OS_NAME"
+echo "Kernel: $KERNEL"
+echo "Uptime: $UPTIME"
+echo "Shell:  $SHELL_NAME"
+echo "CPU:    $CPU"
+echo "GPU:    $GPU"

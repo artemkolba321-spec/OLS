@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# OLS command: uedit (default system editor)
+OLS_DIR="$HOME/OLS"
+LOG_FILE="$OLS_DIR/logs.log"
+FILE="$1"
+
+EDITOR="${EDITOR:-nano}"
+
+echo "Opening $FILE with $EDITOR..."
+"$EDITOR" "$FILE"
+
+echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][uedit] Edited $FILE using $EDITOR" >> "$LOG_FILE"

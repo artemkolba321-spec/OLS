@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# OLS command: mkfile
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# ===== Paths =====
+OLS_DIR="$HOME/OLS"
+LOG_FILE="$OLS_DIR/logs.log"
+
+# ===== Logging =====
+ols_log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][mkfile] $@" >> "$LOG_FILE"
+}
+
+die() {
+    echo "mkfile: $@" >&2
+    ols_log "ERROR: $@"
+    exit 1
+}
+
+# ===== Help =====
+show_help() {
+    cat <<'EOF'
+usage:
+    mkfile <-f|-d> <filename>
+description:
+    This is a small utility 
+    for creating files and directories.
+options:
+    -f         create file 
+    -d         create directory
+    --help     show help
+examples:
+    mkfile -f text.txt
+    mkfile -d directory/
+EOF
+}
+
+# ===== Args =====
+[[ $# -eq 0 ]] && show_help && exit 0
+[[ -z "${2-}" ]] && die "Missing filename or directory name"
+
+if [[ "$1" == "--help" ]]; then
+    show_help
+    exit 0
+fi
+
+# ===== Main =====
+case "$1" in
+    -d)
+        for dir in "${@:2}"; do
+            mkdir -p "$dir" || die "Failed to create directory $dir"
+            ols_log "Created directory: $dir"
+        done
+        ;;
+    -f)
+        for file in "${@:2}"; do
+            [[ -e "$file" ]] && die "File already exists: $file"
+            touch "$file" || die "Failed to create file $file"
+            ols_log "Created file: $file"
+        done
+
+        ;;
+    *)
+        die "Invalid argument: $1"
+        ;;
+esac
+
+ols_log "exec: $@"

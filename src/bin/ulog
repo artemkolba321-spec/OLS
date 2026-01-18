@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# OLS command: ulog
+
+case "$1" in
+	list)
+		if [[ ! -z "$2" ]]; then
+			cat ~/OLS/logs.log | grep "$2"
+		else
+			cat ~/OLS/logs.log
+		fi
+		;;
+	clear)
+		: > ~/OLS/logs.log
+		;;
+	*)
+		;;
+esac

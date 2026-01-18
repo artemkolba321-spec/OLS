@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+# OLS command: targz
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# ===== Paths =====
+OLS_DIR="$HOME/OLS"
+LOG_FILE="$OLS_DIR/logs.log"
+
+# ===== Logging =====
+ols_log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][targz] $@" >> "$LOG_FILE"
+}
+
+die() {
+    echo "targz: $@" >&2
+    ols_log "ERROR: $@"
+    exit 1
+}
+
+# ===== Help =====
+show_help() {
+    cat <<'EOF'
+targz - create .tar.gz archive from files or directories
+
+usage:
+    targz <file_or_dir>... [-o <archive_name.tar.gz>]
+
+description:
+    Compress one or more files or directories into a .tar.gz archive.
+    If -o is not specified, the archive will be named after the first file
+    with a .tar.gz extension.
+
+options:
+    -o <archive_name>   Specify the output archive name.
+    --help              Show this help message and exit.
+
+examples:
+    targz myfolder
+        Creates myfolder.tar.gz
+
+    targz file1.txt file2.txt -o backup.tar.gz
+        Creates backup.tar.gz containing file1.txt and file2.txt
+EOF
+}
+
+# ===== Args =====
+[[ $# -eq 0 ]] && show_help && exit 0
+
+if [[ "$1" == "--help" ]]; then
+    show_help
+    exit 0
+fi
+
+# ===== Check tar =====
+command -v tar >/dev/null 2>&1 || die "tar command not found"
+
+# ===== Parse arguments =====
+OUTPUT=""
+FILES=()
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -o)
+            shift
+            [[ $# -eq 0 ]] && die "Missing output archive name after -o"
+            OUTPUT="$1"
+            ;;
+        *)
+            FILES+=("$1")
+            ;;
+    esac
+    shift
+done
+
+[[ ${#FILES[@]} -eq 0 ]] && die "No files or directories specified"
+
+# Set default output if not provided
+if [[ -z "$OUTPUT" ]]; then
+    OUTPUT="${FILES[0]}.tar.gz"
+fi
+
+# ===== Create archive =====
+tar -czf "$OUTPUT" "${FILES[@]}" || die "Failed to create archive $OUTPUT"
+ols_log "Created archive $OUTPUT from: ${FILES[*]}"
+
+echo "Archive created: $OUTPUT"
