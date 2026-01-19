@@ -10,7 +10,7 @@ OLS_BIN="$OLS_DIR/bin"
 OLS_PACKAGES="$OLS_DIR/packages"
 LOG_FILE="$OLS_DIR/logs.log"
 CONFIG_FILE="$HOME/.olsrc"
-PROJECT_FILE="$PWD/.olsproject"
+PROJECT_FILE="$HOME/.olsproject"
 
 mkdir -p "$OLS_DIR"
 touch "$LOG_FILE"
