@@ -1,4 +1,4 @@
-# OLS v0.1.0
+# OLS v0.1.1
 OLS (Open Linux Shell) - This is a project aimed at improving the work with the terminal.
 
 ## installation
