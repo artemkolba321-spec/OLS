@@ -17,3 +17,16 @@ $ bash ./init.sh
 $ zsh ./init.sh
 ```
 everything is ready
+## philosophy
+1. **Everything must be logged**  
+   - All actions are recorded, making it easy to spot errors (EE) and trace what happened.
+
+2. **OLS is a friendly set of programs**  
+   - Minimal unnecessary flags  
+   - Clear and consistent helpers (`--help` and `hp`)  
+   - Commands work intuitively, even for advanced workflows.
+
+3. **Designed for pipelines**  
+   - All tools are pipeline-friendly, allowing chaining of commands effortlessly.  
+   - Supports standard Linux streams (stdin/stdout/stderr) for maximum flexibility.
+
