@@ -1,17 +1,71 @@
 #!/usr/bin/env bash
 # OLS command: ulog
 
+set -euo pipefail
+IFS=$'\n\t'
+
+LOG_FILE="$HOME/OLS/logs.log"
+
+die() {
+    echo "ulog: $@" >&2
+    exit 1
+}
+
+show_help() {
+    cat <<'EOF'
+usage:
+    ulog list [pattern]
+    ulog clear
+    ulog help
+
+description:
+    ulog is a small utility for working with OLS logs.
+    It is designed to be used with pipelines (|) and standard UNIX tools.
+
+commands:
+    list [pattern]
+        Print OLS logs to stdout.
+        If pattern is provided, only matching lines are shown.
+
+    clear
+        Clear the OLS log file.
+
+    help
+        Show this help message.
+
+examples:
+    ulog list
+    ulog list nurl
+    ulog list EE
+    ulog list | tail -n 20
+    ulog list | grep update
+    ulog list | awk '{print $3}'
+    ulog clear
+EOF
+}
+
+[[ $# -eq 0 ]] && show_help && exit 0
+
 case "$1" in
-	list)
-		if [[ ! -z "$2" ]]; then
-			cat ~/OLS/logs.log | grep "$2"
-		else
-			cat ~/OLS/logs.log
-		fi
-		;;
-	clear)
-		: > ~/OLS/logs.log
-		;;
-	*)
-		;;
+    list)
+        if [[ ! -f "$LOG_FILE" ]]; then
+            die "Log file not found: $LOG_FILE"
+        fi
+
+        if [[ -n "${2-}" ]]; then
+            grep -- "$2" "$LOG_FILE"
+        else
+            cat "$LOG_FILE"
+        fi
+        ;;
+    clear)
+        : > "$LOG_FILE"
+        echo "ulog: log file cleared"
+        ;;
+    --help)
+        show_help
+        ;;
+    *)
+        die "Unknown command: $1"
+        ;;
 esac

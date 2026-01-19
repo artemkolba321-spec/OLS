@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# OLS command: hp
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# ===== Paths =====
+OLS_DIR="$HOME/OLS"
+BIN_DIR="$OLS_DIR/bin"
+LOG_FILE="$OLS_DIR/logs.log"
+
+# ===== Logging =====
+ols_log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][hp] $@" >> "$LOG_FILE"
+}
+
+die() {
+    echo "hp: $@" >&2
+    ols_log "EE: $@"
+    exit 1
+}
+
+# ===== Helpers =====
+show_help() {
+    cat <<'EOF'
+Usage: hp <command>
+
+Displays help information for OLS commands.
+
+Examples:
+    hp gx        show help for gx
+    hp lslog     show help for lslog
+    hp mkfile    show help for mkfile
+EOF
+}
+
+# ===== Args =====
+if [[ $# -eq 0 ]]; then
+    show_help
+    exit 0
+fi
+
+cmd="$1"
+
+# ===== Check if command exists in OLS bin =====
+if [[ -x "$BIN_DIR/$cmd" ]]; then
+    echo "===== HELP for $cmd ====="
+    "$BIN_DIR/$cmd" --help
+    echo "========================="
+    ols_log "Displayed help for $cmd"
+else
+    die "hp: no help found for '$cmd'"
+fi

@@ -15,7 +15,7 @@ ols_log() {
 
 die() {
     echo "targz: $@" >&2
-    ols_log "ERROR: $@"
+    ols_log "EE: $@"
     exit 1
 }
 

@@ -66,6 +66,7 @@ EOF
 fi
 
 if [[ ! -f "$PROJECT_FILE" ]]; then
+    touch "$PROJECT_FILE"
     cat > "$PROJECT_FILE" <<'EOF'
 # OLS project configuration
 

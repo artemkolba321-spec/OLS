@@ -11,12 +11,12 @@ LOG_FILE="${LOG_FILE:-$OLS_DIR/logs.log}"
 
 # ===== Logging =====
 ols_log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS] $*" >> "$LOG_FILE"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS] $@" >> "$LOG_FILE"
 }
 
 die() {
-    echo "Error: $*" >&2
-    ols_log "ERROR: $*"
+    echo "Error: $@" >&2
+    ols_log "EE: $@"
     exit 1
 }
 
@@ -160,7 +160,7 @@ interactive_shell() {
     echo "Welcome to OLS! (help — show help, exit — quit)"
 
     while true; do
-        read -rp "ols> " cmd args || break
+        read -rp "ols>" cmd args || break
 
         case "$cmd" in
             exit)
@@ -171,21 +171,24 @@ interactive_shell() {
             help)
                 show_help
                 ;;
-            bash:*)
-                plugin="${cmd#bash:}"
-                if declare -f "$plugin" >/dev/null 2>&1; then
-                    "$plugin" $args
-                    ols_log "Plugin executed: $plugin $args"
+            run)
+                if [[ -z "$args" ]]; then
+                    echo "run: missing command"
                 else
-                    echo "Bash plugin not found: $plugin"
-                    ols_log "Plugin missing: $plugin"
+                    eval "$args" 2>&1
                 fi
+
                 ;;
             "")
                 ;;
             *)
-                echo "Unknown command: $cmd"
-                ols_log "Unknown command: $cmd $args"
+                if command -v "$cmd" >/dev/null 2>&1; then
+                    "$cmd" "$args"
+                    ols_log "System command executed: $cmd $args"
+                else
+                    echo "Unknown command: $cmd"
+                    ols_log "Unknown command: $cmd $args"
+                fi
                 ;;
         esac
     done

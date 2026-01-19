@@ -10,12 +10,12 @@ LOG_FILE="$OLS_DIR/logs.log"
 
 # ===== Logging =====
 ols_log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][nurl] $*" >> "$LOG_FILE"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][nurl] $@" >> "$LOG_FILE"
 }
 
 die() {
     echo "nurl: $@" >&2
-    ols_log "ERROR: $@"
+    ols_log "EE: $@"
     exit 1
 }
 
