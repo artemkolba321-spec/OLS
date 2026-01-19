@@ -10,10 +10,11 @@ OLS_BIN="$OLS_DIR/bin"
 OLS_PACKAGES="$OLS_DIR/packages"
 LOG_FILE="$OLS_DIR/logs.log"
 CONFIG_FILE="$HOME/.olsrc"
-BIND_FILE="$HOME/.olsbind"
+PROJECT_FILE="$PWD/.olsproject"
 
 mkdir -p "$OLS_DIR"
 touch "$LOG_FILE"
+chmod 644 "$LOG_FILE"
 
 ols_log() {
     local msg="$1"
@@ -59,16 +60,31 @@ OLS_BIN="$OLS_DIR/bin"
 # uedit
 export EDITOR=nano
 EOF
+    chmod 644 "$CONFIG_FILE"
     echo "Created OLS config at $CONFIG_FILE"
     ols_log "Created config"
 fi
+
+if [[ ! -f "$PROJECT_FILE" ]]; then
+    cat > "$PROJECT_FILE" <<'EOF'
+# OLS project configuration
+
+NAME="OLS"
+VERSION="0.1.0"
+AUTHOR="Artem"
+EOF
+    echo "Created .olsproject"
+    ols_log "Created .olsproject in project root"
+    chmod 644 "$PROJECT_FILE"
+fi
+
 # ===== Install Bash commands =====
 for cmd in "$PWD/src/bin/"*; do
     base=$(basename "$cmd")
     if [[ -f "$cmd" ]]; then
         
         cp "$cmd" "$OLS_BIN/$base"
-        chmod +x "$OLS_BIN/$base"
+        chmod 755 "$OLS_BIN/$base"
         echo "Installed $base → $OLS_BIN/$base"
     else
         ols_log "Command installation failed: $base"
