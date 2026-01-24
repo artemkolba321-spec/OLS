@@ -4,96 +4,127 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# ===== Directories =====
+# ===== Paths =====
 OLS_DIR="$HOME/OLS"
 OLS_BIN="$OLS_DIR/bin"
-OLS_PACKAGES="$OLS_DIR/packages"
+OLS_LIB="$OLS_DIR/lib"
+OLS_SBIN="$OLS_DIR/sbin"
 LOG_FILE="$OLS_DIR/logs.log"
 CONFIG_FILE="$HOME/.olsrc"
-PROJECT_FILE="$HOME/.olsproject"
+PROFILE_FILE="$HOME/.profile"
+DAEMON="$OLS_LIB/daemon.sh"
 
-mkdir -p "$OLS_DIR"
-touch "$LOG_FILE"
-chmod 644 "$LOG_FILE"
-
+# ===== Logging =====
 ols_log() {
-    local msg="$1"
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS] $msg" >> "$LOG_FILE"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS] $*" >> "$LOG_FILE"
 }
 
-ols_log "Install started"
+# ===== Safety prompt =====
+echo -e "Warning: Installing OLS may modify your shell configuration files."
+printf "Are you sure you want to continue? [y/N]: "
 
-# ===== Create directories =====
-mkdir -p "$OLS_BIN" "$OLS_PACKAGES"
+read -r confirm || confirm=""
+confirm="${confirm:-N}"
+confirm="$(printf '%s' "$confirm" | tr '[:upper:]' '[:lower:]')"
 
-# ===== Set permissions =====
-# bin: user can read/write/execute, others can only execute (can't list files)
+if [[ "$confirm" != "y" ]]; then
+    echo "Installation cancelled."
+    exit 0
+fi
+
+# ===== Prepare filesystem =====
+mkdir -p "$OLS_DIR" "$OLS_BIN" "$OLS_LIB" "$OLS_SBIN"
+touch "$LOG_FILE" "$CONFIG_FILE" "$PROFILE_FILE"
+
+chmod 644 "$LOG_FILE" "$CONFIG_FILE"
 chmod 711 "$OLS_BIN"
+chmod 700 "$OLS_LIB"
+chmod 700 "$OLS_SBIN"
 
-# ===== Detect user shell =====
+ols_log "Installation started"
+
+# ===== Detect shell =====
 if [[ -n "${BASH_VERSION-}" ]]; then
     SHELL_RC="$HOME/.bashrc"
 elif [[ -n "${ZSH_VERSION-}" ]]; then
     SHELL_RC="$HOME/.zshrc"
 else
-    SHELL_RC="$HOME/.profile"
+    SHELL_RC="$PROFILE_FILE"
 fi
 
 # ===== Add OLS/bin to PATH =====
 PATH_LINE="export PATH=\"$OLS_BIN:\$PATH\""
-if ! grep -Fxq "$PATH_LINE" "$SHELL_RC"; then
+if ! grep -Fxq "$PATH_LINE" "$SHELL_RC" 2>/dev/null; then
     echo "$PATH_LINE" >> "$SHELL_RC"
-    echo "OLS: added $OLS_BIN to PATH in $SHELL_RC"
-
-    ols_log "added $OLS_BIN to PATH"
+    ols_log "Added OLS/bin to PATH in $SHELL_RC"
 fi
 
 # ===== Create config if missing =====
-if [[ ! -f "$CONFIG_FILE" ]]; then
-    touch "$CONFIG_FILE"
+if [[ ! -s "$CONFIG_FILE" ]]; then
     cat > "$CONFIG_FILE" <<'EOF'
 # OLS configuration (~/.olsrc)
 
 OLS_DIR="$HOME/OLS"
 OLS_BIN="$OLS_DIR/bin"
 
-# uedit
+# Default editor
 export EDITOR=nano
 EOF
-    chmod 644 "$CONFIG_FILE"
-    echo "Created OLS config at $CONFIG_FILE"
-    ols_log "Created config"
+    ols_log "Created default ~/.olsrc"
 fi
 
-if [[ ! -f "$PROJECT_FILE" ]]; then
-    touch "$PROJECT_FILE"
-    cat > "$PROJECT_FILE" <<'EOF'
-# OLS project configuration
-
-NAME="OLS"
-VERSION="0.1.0"
-AUTHOR="Artem"
-EOF
-    echo "Created .olsproject"
-    ols_log "Created .olsproject in project root"
-    chmod 644 "$PROJECT_FILE"
-fi
-
-# ===== Install Bash commands =====
+# ===== Install bin commands =====
 for cmd in "$PWD/src/bin/"*; do
-    base=$(basename "$cmd")
-    if [[ -f "$cmd" ]]; then
-        
-        cp "$cmd" "$OLS_BIN/$base"
-        chmod 755 "$OLS_BIN/$base"
-        echo "Installed $base → $OLS_BIN/$base"
-    else
-        ols_log "Command installation failed: $base"
-    fi
+    [[ -f "$cmd" ]] || continue
+    base="$(basename "$cmd")"
+    cp "$cmd" "$OLS_BIN/$base"
+    chmod 755 "$OLS_BIN/$base"
+    echo "Installed bin: $base"
+    ols_log "Installed bin: $base"
 done
-ols_log "Installed commands"
 
-echo "OLS initialization complete!"
-echo "Run 'source $SHELL_RC' or restart your terminal to use OLS commands."
+# ===== Install lib files =====
+for lib in "$PWD/src/lib/"*; do
+    [[ -f "$lib" ]] || continue
+    base="$(basename "$lib")"
+    cp "$lib" "$OLS_LIB/$base"
+    chmod 700 "$OLS_LIB/$base"
+    echo "Installed lib: $base"
+    ols_log "Installed lib: $base"
+done
 
-ols_log "initialization complete"
+# ===== Install sbin binaries =====
+for sbin in "$PWD/src/sbin/"*; do
+    [[ -f "$sbin" ]] || continue
+    base="$(basename "$sbin")"
+    cp "$sbin" "$OLS_SBIN/$base"
+    chmod 755 "$OLS_SBIN/$base"
+    echo "Installed sbin: $base"
+    ols_log "Installed sbin: $base"
+done
+
+# ===== Add daemon autostart to ~/.profile =====
+if [[ -x "$DAEMON" ]]; then
+    if ! grep -Fqx "# Start OLS daemon" "$PROFILE_FILE"; then
+        cat <<'EOF' >> "$PROFILE_FILE"
+
+# Start OLS daemon
+if [ -x "$HOME/OLS/lib/daemon.sh" ] && ! pgrep -f "$HOME/OLS/lib/daemon.sh" >/dev/null; then
+    "$HOME/OLS/lib/daemon.sh" &
+fi
+EOF
+        ols_log "Added daemon autostart to ~/.profile"
+    fi
+fi
+
+# ===== Done =====
+echo
+echo "OLS installation complete."
+echo
+echo "To apply changes now, run:"
+echo "  source $SHELL_RC"
+echo "  source $PROFILE_FILE"
+echo
+echo "Or just restart your terminal."
+
+ols_log "Installation finished"

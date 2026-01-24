@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# OLS command: uedit (default system editor)
+# OLS command: uedit
 OLS_DIR="$HOME/OLS"
 LOG_FILE="$OLS_DIR/logs.log"
 FILE="$1"

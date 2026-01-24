@@ -1,57 +1,38 @@
 #!/usr/bin/env bash
 # OLS command: gx
-# Git eXec — clone GitHub repo and enter its directory
 
 set -euo pipefail
 IFS=$'\n\t'
 
-# ===== Paths =====
+# ===== ols_logging =====
 OLS_DIR="$HOME/OLS"
-LOG_FILE="$OLS_DIR/logs.log"
+LOG_FILE="$OLS_DIR/ols_logs.ols_log"
 
-# ===== Logging =====
 ols_log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][gx] $@" >> "$LOG_FILE"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][gx] $*" >> "$LOG_FILE"
 }
 
 die() {
-    echo "gx: $@" >&2
-    ols_log "EE: $@"
+    echo "gx: $*" >&2
+    ols_log "EE: $*"
     exit 1
 }
 
 # ===== Help =====
-gx_help() {
-    cat <<'EOF'
-gx - Git eXec
+if [[ $# -eq 0 || "$1" == "--help" ]]; then
+    cat <<EOF
+gx - Git exec (clone wrapper)
 
 usage:
-    gx <user>/<repo>
-    gx <HTTPS>
+    gx <user>/<repo>       (GitHub username/repo)
+    gx <HTTPS>             (https://github.com/user/repo.git)
+    gx <SSH>               (git@github.com:user/repo.git)
+
 description:
-    Clones a GitHub repository
-    and automatically enters its directory.
-options:
-    --help      Show this help message and exit.
-examples:
-    gx torvalds/linux
-    gx https://github.com/artemkolba321-spec/ols-repo.git
+    Clones a GitHub repository. DOES NOT change directory.
 EOF
-}
-
-# ===== Args =====
-if [[ $# -eq 0 ]]; then
-    gx_help
     exit 0
 fi
-
-if [[ "$1" == "--help" ]]; then
-    gx_help
-    exit 0
-fi
-
-# ===== Check git =====
-command -v git >/dev/null 2>&1 || die "git not found"
 
 # ===== Main =====
 repo="$1"
@@ -60,19 +41,22 @@ repo="$1"
 if [[ "$repo" =~ ^https://github.com/ ]]; then
     url="$repo"
     dir="$(basename "$repo" .git)"
+elif [[ "$repo" =~ ^git@github.com: ]]; then
+    url="$repo"
+    dir="$(basename "$repo" .git)"
 else
     url="https://github.com/$repo.git"
     dir="$(basename "$repo")"
 fi
 
-# If directory exists, just enter it
+# If directory exists, skip cloning
 if [[ -d "$dir" ]]; then
-    cd "$dir" || die "Cannot enter directory $dir"
-    ols_log "Entered existing repository $dir"
+    echo "gx: directory '$dir' already exists, skipping clone"
+    ols_log "Skip clone: $dir exists"
     exit 0
 fi
 
 # Clone repository
-git clone "$url" || die "Failed to clone $url"
-cd "$dir" || die "Failed to enter directory $dir"
-ols_log "Cloned and entered repository $dir"
+git clone "$url" "$dir" || die "failed to clone $url"
+echo "gx: cloned repository '$dir'"
+ols_log "Cloned repository $dir"

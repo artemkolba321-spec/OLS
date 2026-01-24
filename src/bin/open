@@ -34,8 +34,8 @@ EOF
 }
 
 die() {
-    echo "open: $*" >&2
-    ols_log "EE: $*"
+    echo "open: $@" >&2
+    ols_log "EE: $@"
     exit 1
 }
 
