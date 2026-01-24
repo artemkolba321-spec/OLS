@@ -94,7 +94,7 @@ for lib in "$PWD/src/lib/"*; do
 done
 
 # ===== Install sbin binaries =====
-for sbin in "$PWD/src/sbin/"*; do
+for sbinfile in "$PWD/src/sbin/"*(N); do
     [[ -f "$sbin" ]] || continue
     base="$(basename "$sbin")"
     cp "$sbin" "$OLS_SBIN/$base"
