@@ -1,46 +1,60 @@
 #!/usr/bin/env bash
-# Bash version of OLS daemon
+# OLS Bash daemon
+# Purpose: monitor network state and write it to OLS/lib/network.state
 
 set -euo pipefail
 IFS=$'\n\t'
 
-OLS_DIR="${OLS_DIR:-$HOME/OLS}"
+# ===== Paths =====
+OLS_DIR="$HOME/OLS"
+LIB_DIR="$OLS_DIR/lib"
 LOG_FILE="$OLS_DIR/logs.log"
-QUEUE_FILE="/tmp/ols_daemon_queue"
-INTERVAL=60
-FAIL_THRESHOLD=3
+STATE_FILE="$LIB_DIR/network.state"
+PID_FILE="$LIB_DIR/daemon.pid"
 
-log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [daemon] $@" >> "$LOG_FILE"
+CHECK_INTERVAL=60   # seconds
+
+# ===== Logging =====
+ols_log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][daemon] $*" >> "$LOG_FILE"
 }
 
+# ===== Single instance guard =====
+if [[ -f "$PID_FILE" ]]; then
+    OLD_PID="$(cat "$PID_FILE" 2>/dev/null || true)"
+    if [[ -n "${OLD_PID:-}" ]] && kill -0 "$OLD_PID" 2>/dev/null; then
+        # already running
+        exit 0
+    fi
+fi
+
+echo "$$" > "$PID_FILE"
+trap 'rm -f "$PID_FILE"; exit 0' INT TERM EXIT
+
+# ===== Network check =====
 network_ok() {
     ping -c1 -W1 8.8.8.8 >/dev/null 2>&1
 }
 
-run_command() {
-    bash -c "$@" &
-}
+# ===== Initial state =====
+mkdir -p "$LIB_DIR"
+touch "$STATE_FILE"
 
-process_queue_file() {
-    [[ ! -f "$QUEUE_FILE" ]] && return
+ols_log "daemon started (pid=$$)"
 
-    local remaining=()
-    while IFS= read -r line; do
-        if network_ok; then
-            run_command "$line"
-            log "[OK] executed: $line"
-        else
-            remaining+=("$line")
-        fi
-    done < "$QUEUE_FILE"
-
-    printf "%s\n" "${remaining[@]}" > "$QUEUE_FILE"
-}
-
-log "Bash daemon started with PID $$"
-
+# ===== Main loop =====
 while true; do
-    process_queue_file
-    sleep "$INTERVAL"
+    if network_ok; then
+        if [[ "$(cat "$STATE_FILE" 2>/dev/null)" != "online" ]]; then
+            echo "online" > "$STATE_FILE"
+            ols_log "network: online"
+        fi
+    else
+        if [[ "$(cat "$STATE_FILE" 2>/dev/null)" != "offline" ]]; then
+            echo "offline" > "$STATE_FILE"
+            ols_log "network: offline"
+        fi
+    fi
+
+    sleep "$CHECK_INTERVAL"
 done
