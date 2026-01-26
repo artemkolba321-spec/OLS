@@ -1,0 +1,159 @@
+#!/usr/bin/env bash
+# OLS system command: sys
+# Root-only system and kernel control interface
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# ===== paths =====
+OLS_DIR="$HOME/OLS"
+LOG_FILE="$OLS_DIR/logs.ols"
+
+# ===== logging =====
+ols_log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][sys][root] $*" >> "$LOG_FILE"
+}
+
+die() {
+    echo "sys: $*" >&2
+    ols_log "EE: $*"
+    exit 1
+}
+
+# ===== root check =====
+if [[ "$EUID" -ne 0 ]]; then
+    die "superuser required"
+fi
+
+# ===== args =====
+cmd="${1-}"
+shift || true
+
+# ===== main dispatcher =====
+case "$cmd" in
+
+    # ---------------- info ----------------
+    info)
+        echo "OLS sys — system interface"
+        echo
+        echo "Kernel:      $(uname -r)"
+        echo "User:        $(whomai)"
+        echo "Hostname:    $(hostname)"
+        echo "Uptime:      $(uptime -p)"
+        echo "Shell:       $SHELL"
+        echo
+        echo "Loaded kernel modules: $(lsmod | wc -l)"
+        echo "Running processes:    $(ps -e | wc -l)"
+        ;;
+
+    # ---------------- update ----------------
+    update)
+        echo "Updating system (basic)…"
+        ols_log "system update requested"
+
+        if command -v apt >/dev/null 2>&1; then
+            apt update && apt upgrade -y
+        elif command -v pacman >/dev/null 2>&1; then
+            pacman -Syu --noconfirm
+        elif command -v dnf >/dev/null 2>&1; then
+            dnf upgrade -y
+        else
+            die "no supported package manager found"
+        fi
+
+        ols_log "system updated"
+        echo "System updated."
+        ;;
+
+    # ---------------- kernel/core ----------------
+    core)
+        sub="${1-}"
+        shift || true
+
+        case "$sub" in
+
+            # ----- list loaded modules -----
+            list)
+                lsmod | less
+                ;;
+
+            # ----- kernel status -----
+            status)
+                echo "Kernel version: $(uname -r)"
+                echo "OS:             $(lsb_release -ds 2>/dev/null || uname -s)"
+                echo "Kernel cmdline:"
+                cat /proc/cmdline
+                ;;
+
+            # ----- load module -----
+            load)
+                mod="${1-}"
+                [[ -z "$mod" ]] && die "no module name specified"
+
+                modprobe "$mod" || die "failed to load module $mod"
+                ols_log "core load: $mod"
+
+                echo "Loaded module: $mod"
+                ;;
+
+            # ----- unload module -----
+            unload)
+                mod="${1-}"
+                [[ -z "$mod" ]] && die "no module name specified"
+
+                modprobe -r "$mod" || die "failed to unload module $mod"
+                ols_log "core unload: $mod"
+
+                echo "Unloaded module: $mod"
+                ;;
+
+            # ----- add module to kernel tree -----
+            add)
+                module="${1-}"
+                [[ -z "$module" ]] && die "no module file specified"
+
+                if [[ ! -f "$module" ]]; then
+                    die "module not found: $module"
+                fi
+
+                if [[ ! "$module" == *.ko ]]; then
+                    die "not a kernel module (.ko required)"
+                fi
+
+                KVER="$(uname -r)"
+                MOD_DIR="/lib/modules/$KVER/extra"
+
+                mkdir -p "$MOD_DIR"
+
+                name="$(basename "$module")"
+                cp "$module" "$MOD_DIR/$name" || die "failed to copy module"
+                chmod 644 "$MOD_DIR/$name"
+
+                echo "Module installed:"
+                echo "  $MOD_DIR/$name"
+
+                echo "Updating module dependencies…"
+                depmod -a
+
+                ols_log "core add: $name"
+
+                echo
+                echo "Module added to kernel."
+                echo "Load it with:"
+                echo "  sys core load ${name%.ko}"
+                ;;
+
+            *)
+                die "unknown core command: $sub"
+                ;;
+        esac
+        
+        ;;
+    reboot)
+        reboot
+    ;;
+    # ---------------- unknown ----------------
+    *)
+        die "unknown command: $cmd"
+        ;;
+esac

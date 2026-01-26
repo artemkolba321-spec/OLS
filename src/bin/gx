@@ -4,18 +4,18 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# ===== ols_logging =====
+# ===== logging =====
 OLS_DIR="$HOME/OLS"
 LOG_FILE="$OLS_DIR/logs.ols"
 source "$OLS_DIR/lib/network.sh"
 
 ols_log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][gx] $*" >> "$LOG_FILE"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][gx] $@" >> "$LOG_FILE"
 }
 
 die() {
-    echo "gx: $*" >&2
-    ols_log "EE: $*"
+    echo "gx: $@" >&2
+    ols_log "EE: $@"
     exit 1
 }
 

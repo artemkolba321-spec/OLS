@@ -16,7 +16,7 @@ DAEMON="$OLS_LIB/daemon.sh"
 
 # ===== Logging =====
 ols_log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS] $*" >> "$LOG_FILE"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS] $@" >> "$LOG_FILE"
 }
 
 # ===== Safety prompt =====
@@ -94,7 +94,7 @@ for lib in "$PWD/src/lib/"*; do
 done
 
 # ===== Install sbin binaries =====
-for sbinfile in "$PWD/src/sbin/"*(N); do
+for sbin in "$PWD/src/sbin/"*; do
     [[ -f "$sbin" ]] || continue
     base="$(basename "$sbin")"
     cp "$sbin" "$OLS_SBIN/$base"

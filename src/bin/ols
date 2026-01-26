@@ -196,7 +196,7 @@ interactive_shell() {
 
 # ===== Main =====
 case "${1-}" in
-    help|--help)
+    --help)
         show_help
         ;;
     doctor)
@@ -209,6 +209,10 @@ case "${1-}" in
         interactive_shell
         ;;
     *)
-        die "Unknown command: $1"
+        if [[ "${1-}" == *.ols ]]; then
+            # TODO: add interpreter
+        else
+            die "Unknown command: $1"
+        fi
         ;;
 esac
