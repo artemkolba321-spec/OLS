@@ -13,7 +13,6 @@ LOG_FILE="$OLS_DIR/logs.log"
 CONFIG_FILE="$HOME/.olsrc"
 PROFILE_FILE="$HOME/.profile"
 DAEMON="$OLS_LIB/daemon.sh"
-CORE_BIN="$OLS_SBIN/core"
 
 # ===== Logging =====
 ols_log() {
@@ -74,92 +73,13 @@ EOF
     ols_log "Created default ~/.olsrc"
 fi
 
-# ===== Install core binary =====
-CORE_SRC="$PWD/src/sbin/core"
-if [[ -f "$CORE_SRC" ]]; then
-    cp "$CORE_SRC" "$CORE_BIN"
-    chmod 755 "$CORE_BIN"
-    ols_log "Installed core binary: $CORE_BIN"
-    echo "Installed core binary"
-else
-    echo "Error: core binary not found in src/sbin/core"
-    exit 1
-fi
 
 # ===== Install bin commands as symlinks to core =====
 for cmd in "$PWD/src/bin/"*; do
     [[ -f "$cmd" ]] || continue
     base="$(basename "$cmd")"
-    ln -sf "$CORE_BIN" "$OLS_BIN/$base"
+    cp "$cmd" "$OLS_BIN/$base"
     chmod 755 "$OLS_BIN/$base"
-    echo "Linked bin: $base -> core"
-    ols_log "Linked bin: $base -> core"
-done
-
-# ===== Install lib files =====
-for lib in "$PWD/src/lib/"*; do
-    [[ -f "$lib" ]] || continue
-    base="$(basename "$lib")"
-    cp "$lib" "$OLS_LIB/$base"
-    chmod 700 "$OLS_LIB/$base"
-    echo "Installed lib: $base"
-    ols_log "Installed lib: $base"
-done
-
-for sbin in "$PWD/src/sbin/"*; do
-    [[ -f "$sbin" ]] || continue
-    base="$(basename "$sbin")"
-    cp "$sbin" "$OLS_SBIN/$base"
-    chmod 711 "$OLS_SBIN/$base"
-    echo "Installed sbin: $base"
-    ols_log "Installed sbin: $base"
-done
-
-# ===== Add daemon autostart to ~/.profile =====
-if [[ -x "$DAEMON" ]]; then
-    if ! grep -Fqx "# Start OLS daemon" "$PROFILE_FILE"; then
-        cat <<'EOF' >> "$PROFILE_FILE"
-
-# Start OLS daemon
-if [ -x "$HOME/OLS/lib/daemon.sh" ] && ! pgrep -f "$HOME/OLS/lib/daemon.sh" >/dev/null; then
-    "$HOME/OLS/lib/daemon.sh" &
-fi
-EOF
-        ols_log "Added daemon autostart to ~/.profile"
-    fi
-fi
-
-# ===== Done =====
-echo
-echo "OLS installation complete."
-echo
-echo "To apply changes now, run:"
-echo "  source $SHELL_RC"
-echo "  source $PROFILE_FILE"
-echo
-echo "Or just restart your terminal."
-
-ols_log "Installation finished"
-
-# ===== Install sbin commands =====
-for sbin in "$PWD/src/sbin/"*; do
-    [[ -f "$sbin" ]] || continue
-    base="$(basename "$sbin")"
-    cp "$sbin" "$OLS_SBIN/$base"
-    chmod 711 "$OLS_SBIN/$base"
-    echo "Installed sbin: $base"
-    ols_log "Installed sbin: $base"
-done
-
-
-# ===== Install bin commands =====
-for cmd in "$PWD/src/bin/"*; do
-    [[ -f "$cmd" ]] || continue
-    base="$(basename "$cmd")"
-    ln -sf "$CORE_BIN" "$OLS_BIN/$base"
-    chmod 755 "$OLS_BIN/$base"
-    echo "Linked bin: $base -> core"
-    ols_log "Linked bin: $base -> core"
 done
 
 # ===== Install lib files =====

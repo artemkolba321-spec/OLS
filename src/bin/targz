@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# OLS command: targz
+# OLS command: targz (minimal flags, -x for extract)
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -22,32 +22,25 @@ die() {
 # ===== Help =====
 show_help() {
     cat <<'EOF'
-targz - create .tar.gz archive from files or directories
+targz - create or extract .tar.gz archives
 
-usage:
-    targz <file_or_dir>... [-o <archive_name.tar.gz>]
+Usage:
+    targz <file_or_dir>... [-o <archive_name.tar.gz>]   # create archive
+    targz -x <archive.tar.gz>                           # extract archive
 
-description:
-    Compress one or more files or directories into a .tar.gz archive.
-    If -o is not specified, the archive will be named after the first file
-    with a .tar.gz extension.
+Options:
+    -o <archive_name>   Specify output archive name (creation only)
+    -x                  Extract archive
+    --help              Show this help message
 
-options:
-    -o <archive_name>   Specify the output archive name.
-    --help              Show this help message and exit.
-
-examples:
-    targz myfolder
-        Creates myfolder.tar.gz
-
-    targz file1.txt file2.txt -o backup.tar.gz
-        Creates backup.tar.gz containing file1.txt and file2.txt
+Behavior:
+    - No flags → create archive from given files/directories
+    - -x → extract archive into folder with archive name
 EOF
 }
 
 # ===== Args =====
 [[ $# -eq 0 ]] && show_help && exit 0
-
 if [[ "$1" == "--help" ]]; then
     show_help
     exit 0
@@ -57,6 +50,7 @@ fi
 command -v tar >/dev/null 2>&1 || die "tar command not found"
 
 # ===== Parse arguments =====
+MODE="create"
 OUTPUT=""
 FILES=()
 
@@ -64,8 +58,14 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         -o)
             shift
-            [[ $# -eq 0 ]] && die "Missing output archive name after -o"
+            [[ $# -eq 0 ]] && die "Missing archive name after -o"
             OUTPUT="$1"
+            ;;
+        -x)
+            MODE="extract"
+            shift
+            [[ $# -eq 0 ]] && die "Missing archive file to extract after -x"
+            FILES+=("$1")
             ;;
         *)
             FILES+=("$1")
@@ -74,15 +74,19 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-[[ ${#FILES[@]} -eq 0 ]] && die "No files or directories specified"
-
-# Set default output if not provided
-if [[ -z "$OUTPUT" ]]; then
-    OUTPUT="${FILES[0]}.tar.gz"
+# ===== Execute =====
+if [[ "$MODE" == "create" ]]; then
+    [[ ${#FILES[@]} -gt 0 ]] || die "No files or directories specified to archive"
+    [[ -z "$OUTPUT" ]] && OUTPUT="${FILES[0]}.tar.gz"
+    tar -czf "$OUTPUT" "${FILES[@]}" || die "Failed to create archive $OUTPUT"
+    ols_log "Created archive $OUTPUT from: ${FILES[*]}"
+    echo "Archive created: $OUTPUT"
+else
+    ARCHIVE="${FILES[0]}"
+    [[ -f "$ARCHIVE" ]] || die "Archive file $ARCHIVE not found"
+    DIR_NAME="$(basename "$ARCHIVE" .tar.gz)"
+    mkdir -p "$DIR_NAME"
+    tar -xzf "$ARCHIVE" -C "$DIR_NAME" || die "Failed to extract $ARCHIVE"
+    ols_log "Extracted archive $ARCHIVE into $DIR_NAME"
+    echo "Archive extracted into: $DIR_NAME"
 fi
-
-# ===== Create archive =====
-tar -czf "$OUTPUT" "${FILES[@]}" || die "Failed to create archive $OUTPUT"
-ols_log "Created archive $OUTPUT from: ${FILES[*]}"
-
-echo "Archive created: $OUTPUT"
