@@ -1,8 +1,6 @@
 #include "utils.hpp"
 #include "log.hpp"
 
-ols::log::info("Kernel init");
-
 int main() {
-    
+    ols::log::info("core init");
 }
