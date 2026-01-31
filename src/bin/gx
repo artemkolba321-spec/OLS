@@ -35,10 +35,10 @@ EOF
     exit 0
 fi
 
-if ! net_online; then
-    die "network offline — gx skipped"
-    exit 1
-fi
+# if ! net_online; then
+#     die "network offline — gx skipped"
+#     exit 1
+# fi
 
 # ===== Main =====
 repo="$1"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# OLS init script (symlink version)
+# OLS init script
 
 set -euo pipefail
 IFS=$'\n\t'

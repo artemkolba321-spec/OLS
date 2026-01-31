@@ -171,14 +171,6 @@ interactive_shell() {
             help)
                 show_help
                 ;;
-            run)
-                if [[ -z "$args" ]]; then
-                    echo "run: missing command"
-                else
-                    eval "$args" 2>&1
-                fi
-
-                ;;
             "")
                 ;;
             *)

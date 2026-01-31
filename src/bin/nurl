@@ -35,10 +35,10 @@ examples:
 EOF
 }
 
-if ! net_online; then
-    die "network offline — nurl skipped"
-    exit 1
-fi
+# if ! net_online; then
+#     die "network offline — nurl skipped"
+#     exit 1
+# fi
 
 
 # ===== Args =====
