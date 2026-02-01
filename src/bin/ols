@@ -160,8 +160,12 @@ interactive_shell() {
     echo "Welcome to OLS! (help — show help, exit — quit)"
 
     while true; do
-        read -rp "ols>" cmd args || break
+            OLD_IFS="$IFS"
+            IFS=' ' read -rp "ols> " -a input_words || break
+            IFS="$OLD_IFS"
 
+            cmd="${input_words[0]-}"
+            args=("${input_words[@]:1}")
         case "$cmd" in
             exit)
                 ols_log "Shell exited"
@@ -171,16 +175,20 @@ interactive_shell() {
             help)
                 show_help
                 ;;
+            PATH)
+                case "${args[0]-}" in
+                    OLS)
+                        tree $HOME/OLS
+                        ;;
+                    *)
+                        echo $PATH
+                esac
+                ;;
             "")
                 ;;
             *)
-                if command -v "$cmd" >/dev/null 2>&1; then
-                    "$cmd" "$args"
-                    ols_log "System command executed: $cmd $args"
-                else
-                    echo "Unknown command: $cmd"
-                    ols_log "Unknown command: $cmd $args"
-                fi
+                echo "Unknown command: $cmd"
+                ols_log "Unknown command: $cmd"
                 ;;
         esac
     done
@@ -190,6 +198,9 @@ interactive_shell() {
 case "${1-}" in
     --help)
         show_help
+        ;;
+    --version)
+        echo $OLS_VERSION
         ;;
     doctor)
         ols_doctor
@@ -202,7 +213,14 @@ case "${1-}" in
         ;;
     *)
         if [[ "${1-}" == *.ols ]]; then
-            # TODO: add interpreter
+            FILE="$1"
+            shift
+
+            if [[ ! -f "$FILE" ]]; then
+                die "File not found: $FILE"
+            fi
+
+            bash "$FILE" "$@"
         else
             die "Unknown command: $1"
         fi
