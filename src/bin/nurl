@@ -7,8 +7,6 @@ IFS=$'\n\t'
 # ===== Paths =====
 OLS_DIR="$HOME/OLS"
 LOG_FILE="$OLS_DIR/logs.log"
-source "$OLS_DIR/lib/network.sh"
-
 
 # ===== Logging =====
 ols_log() {
@@ -34,11 +32,6 @@ examples:
     nurl https://example.com/ | less
 EOF
 }
-
-# if ! net_online; then
-#     die "network offline — nurl skipped"
-#     exit 1
-# fi
 
 
 # ===== Args =====

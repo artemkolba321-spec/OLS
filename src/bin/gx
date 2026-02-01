@@ -7,7 +7,6 @@ IFS=$'\n\t'
 # ===== logging =====
 OLS_DIR="$HOME/OLS"
 LOG_FILE="$OLS_DIR/logs.ols"
-source "$OLS_DIR/lib/network.sh"
 
 ols_log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][gx] $@" >> "$LOG_FILE"
@@ -34,11 +33,6 @@ description:
 EOF
     exit 0
 fi
-
-# if ! net_online; then
-#     die "network offline — gx skipped"
-#     exit 1
-# fi
 
 # ===== Main =====
 repo="$1"
