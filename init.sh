@@ -58,9 +58,9 @@ if ! grep -Fxq "$PATH_LINE" "$SHELL_RC" 2>/dev/null; then
     ols_log "Added OLS/bin to PATH in $SHELL_RC"
 fi
 
-ENV_LINE="soúrce \"\$HOME/OLS/lib/env,sh\""
+ENV_LINE="source \"\$HOME/OLS/lib/env.sh\""
 if ! grep -Fxq "$ENV_LINE" "$SHELL_RC" 2>/dev/null; then
-    echo "ENV_LINE" >> "SHELL_RC"
+    echo "$ENV_LINE" >> "$SHELL_RC"
 fi
 
 # ===== Create config if missing =====
