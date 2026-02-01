@@ -12,7 +12,6 @@ OLS_SBIN="$OLS_DIR/sbin"
 LOG_FILE="$OLS_DIR/logs.log"
 CONFIG_FILE="$HOME/.olsrc"
 PROFILE_FILE="$HOME/.profile"
-DAEMON="$OLS_LIB/daemon.sh"
 
 # ===== Logging =====
 ols_log() {
@@ -59,6 +58,11 @@ if ! grep -Fxq "$PATH_LINE" "$SHELL_RC" 2>/dev/null; then
     ols_log "Added OLS/bin to PATH in $SHELL_RC"
 fi
 
+ENV_LINE="soúrce \"\$HOME/OLS/lib/env,sh\""
+if ! grep -Fxq "$ENV_LINE" "$SHELL_RC" 2>/dev/null; then
+    echo "ENV_LINE" >> "SHELL_RC"
+fi
+
 # ===== Create config if missing =====
 if [[ ! -s "$CONFIG_FILE" ]]; then
     cat > "$CONFIG_FILE" <<'EOF'
@@ -94,20 +98,6 @@ for lib in "$PWD/src/lib/"*; do
     echo "Installed lib: $base"
     ols_log "Installed lib: $base"
 done
-
-# ===== Add daemon autostart to ~/.profile =====
-if [[ -x "$DAEMON" ]]; then
-    if ! grep -Fqx "# Start OLS daemon" "$PROFILE_FILE"; then
-        cat <<'EOF' >> "$PROFILE_FILE"
-
-# Start OLS daemon
-if [ -x "$HOME/OLS/lib/daemon.sh" ] && ! pgrep -f "$HOME/OLS/lib/daemon.sh" >/dev/null; then
-    "$HOME/OLS/lib/daemon.sh" &
-fi
-EOF
-        ols_log "Added daemon autostart to ~/.profile"
-    fi
-fi
 
 # ===== Done =====
 echo
