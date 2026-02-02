@@ -17,7 +17,7 @@ description:
 	for viewing logs.
 examples:
 	lslog
-	lslog | grep nurl
+	lslog | sort | uniq
 	lslog | grep EE
 EOF
 }

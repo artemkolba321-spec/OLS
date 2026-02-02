@@ -109,7 +109,7 @@ ols_doctor() {
 
     SYSTEM_DIRS=("$OLS_DIR" "$BIN_DIR")
     SYSTEM_FILES=("$LOG_FILE" "$HOME/.olsrc")
-    DEPENDENCIES=(git wget bash tar touch mkdir)
+    DEPENDENCIES=(git wget bash tar touch mkdir tree) 
 
     # ===== Check directories =====
     for dir in "${SYSTEM_DIRS[@]}"; do
@@ -184,6 +184,9 @@ interactive_shell() {
                         echo $PATH
                 esac
                 ;;
+            doctor)
+                ols_doctor
+                ;;
             "")
                 ;;
             *)
@@ -214,7 +217,7 @@ case "${1-}" in
     *)
         if [[ "${1-}" == *.ols ]]; then
             FILE="$1"
-            shift
+            shift || true
 
             if [[ ! -f "$FILE" ]]; then
                 die "File not found: $FILE"
