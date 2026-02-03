@@ -35,7 +35,7 @@ EOF
 }
 
 # ===== Args =====
-if [[ $# -eq 0 ]]; then
+if [[ $# -eq 0 || "$1" == "--help" ]]; then
     show_help
     exit 0
 fi
