@@ -26,15 +26,20 @@ show_help() {
 Open Linux Shell (OLS)
 
 usage:
-    ols              — start interactive shell
-    ols help         — show help
-    ols doctor       — check OLS installation
-    ols update       — update OLS from official repository
+    ols              - start interactive shell
+    ols --help       - show this help
+    ols doctor       - run diagnostics
+    ols update       - update OLS from git repository
 
 interactive:
-    bash:<plugin>    — run bash plugin
+    help             - show this help
+    exit             - exit OLS
+    PATH             - show PATH or OLS tree
+    doctor           - run diagnostics
+    <command> [args] - run system command
 EOF
 }
+
 
 # ===== Doctor =====
 ols_doctor() {
@@ -190,6 +195,10 @@ interactive_shell() {
             "")
                 ;;
             *)
+                if command -v "$cmd" >/dev/null 2>&1; then
+                    "$cmd" "${args[@]-}"
+                    continue
+                fi
                 echo "Unknown command: $cmd"
                 ols_log "Unknown command: $cmd"
                 ;;
