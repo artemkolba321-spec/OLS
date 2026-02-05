@@ -12,6 +12,7 @@ OLS_SBIN="$OLS_DIR/sbin"
 LOG_FILE="$OLS_DIR/logs.log"
 CONFIG_FILE="$HOME/.olsrc"
 PROFILE_FILE="$HOME/.profile"
+PLUGINS_DIR="$OLS_DIR/plugins"
 
 # ===== Logging =====
 ols_log() {
@@ -32,12 +33,12 @@ if [[ "$confirm" != "y" ]]; then
 fi
 
 # ===== Prepare filesystem =====
-mkdir -p "$OLS_DIR" "$OLS_BIN" "$OLS_LIB" "$OLS_SBIN"
+mkdir -p "$OLS_DIR" "$OLS_BIN" "$OLS_LIB" "$OLS_SBIN" "$PLUGINS_DIR"
 touch "$LOG_FILE" "$CONFIG_FILE" "$PROFILE_FILE"
 
 chmod 644 "$LOG_FILE" "$CONFIG_FILE"
-chmod 711 "$OLS_BIN" "$OLS_SBIN"
-chmod 700 "$OLS_LIB"
+chmod 711 "$OLS_BIN" "$OLS_SBIN" "$PLUGINS_DIR"
+chmod 700 "$OLS_LIB" 
 
 
 ols_log "Installation started"

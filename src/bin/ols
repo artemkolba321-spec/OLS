@@ -40,7 +40,6 @@ interactive:
 EOF
 }
 
-
 # ===== Doctor =====
 ols_doctor() {
     echo "OLS Doctor report"
@@ -114,7 +113,7 @@ ols_doctor() {
 
     SYSTEM_DIRS=("$OLS_DIR" "$BIN_DIR")
     SYSTEM_FILES=("$LOG_FILE" "$HOME/.olsrc")
-    DEPENDENCIES=(git wget bash tar touch mkdir tree) 
+    DEPENDENCIES=(git wget bash tar touch mkdir tree lua jq) 
 
     # ===== Check directories =====
     for dir in "${SYSTEM_DIRS[@]}"; do
@@ -165,12 +164,12 @@ interactive_shell() {
     echo "Welcome to OLS! (help — show help, exit — quit)"
 
     while true; do
-            OLD_IFS="$IFS"
-            IFS=' ' read -rp "ols> " -a input_words || break
-            IFS="$OLD_IFS"
+        OLD_IFS="$IFS"
+        IFS=' ' read -rp "ols> " -a input_words || break
+        IFS="$OLD_IFS"
 
-            cmd="${input_words[0]-}"
-            args=("${input_words[@]:1}")
+        cmd="${input_words[0]-}"
+        args=("${input_words[@]:1}")
         case "$cmd" in
             exit)
                 ols_log "Shell exited"
@@ -183,10 +182,11 @@ interactive_shell() {
             PATH)
                 case "${args[0]-}" in
                     OLS)
-                        tree $HOME/OLS
+                        tree "$OLS_DIR"
                         ;;
                     *)
-                        echo $PATH
+                        echo "$PATH"
+                        ;;
                 esac
                 ;;
             doctor)
@@ -195,16 +195,27 @@ interactive_shell() {
             "")
                 ;;
             *)
+                PLUGIN_DIR="$OLS_DIR/plugins/$cmd"
+                PLUGIN_MAIN="$PLUGIN_DIR/plugin.lua"
+
+                if [[ -f "$PLUGIN_MAIN" ]]; then
+                    lua "$PLUGIN_MAIN" "${args[@]}"
+                    continue
+                fi
+                
+                # If not a plugin, try system command
                 if command -v "$cmd" >/dev/null 2>&1; then
                     "$cmd" "${args[@]-}"
                     continue
                 fi
+
                 echo "Unknown command: $cmd"
                 ols_log "Unknown command: $cmd"
                 ;;
         esac
     done
 }
+
 
 # ===== Main =====
 case "${1-}" in

@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+# OLS command: olsp
+# Handles plugin creation, build, installation, and listing
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# ===== Logging =====
+OLS_DIR="${OLS_DIR:-$HOME/OLS}"
+PLUGINS_DIR="$OLS_DIR/plugins"
+LOG_FILE="$OLS_DIR/logs.log"
+
+# ===== Helpers =====
+ols_log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][olsp] $@" >> "$LOG_FILE"
+}
+
+die() {
+    echo "olsp: $@" >&2
+    ols_log "EE: $@"
+    exit 1
+}
+
+# ===== Ensure plugins dir exists =====
+mkdir -p "$PLUGINS_DIR"
+
+# ===== Main =====
+case "${1-}" in
+    # ----------------- INIT -----------------
+    init)
+        PLUGIN_NAME="${2-}"
+        [[ -z "$PLUGIN_NAME" ]] && die "Usage: olsp init <plugin-name>"
+        [[ -d "$PLUGIN_NAME" ]] && die "Directory '$PLUGIN_NAME' already exists"
+
+        mkdir "$PLUGIN_NAME"
+        cd "$PLUGIN_NAME"
+
+        # create package.json
+        cat > package.json <<EOF
+{
+  "name": "$PLUGIN_NAME",
+  "version": "0.1.0",
+  "author": "$USER"
+}
+EOF
+
+        # create template plugin.lua
+        cat > plugin.lua <<'EOF'
+print("Hello from plugin!")
+EOF
+
+        chmod 644 package.json plugin.lua
+        mkdir files
+
+        echo "Plugin '$PLUGIN_NAME' initialized successfully!"
+        ;;
+
+    # ----------------- BUILD -----------------
+    build)
+        PLUGIN_DIR="${2-}"
+        [[ -z "$PLUGIN_DIR" ]] && die "Usage: olsp build <plugin-dir>"
+        [[ ! -d "$PLUGIN_DIR" ]] && die "Plugin directory not found"
+
+        PLUGIN_NAME="$(basename "$PLUGIN_DIR")"
+        PARENT_DIR="$(dirname "$PLUGIN_DIR")"
+
+        # Archive plugin directory with correct structure
+        tar -czf "$PLUGIN_NAME.olsp" -C "$PARENT_DIR" "$PLUGIN_NAME"
+
+        echo "Plugin built: $PLUGIN_NAME.olsp"
+        ols_log "Built plugin: $PLUGIN_NAME"
+        ;;
+
+
+    # ----------------- INSTALL -----------------
+    install)
+        PACKAGE_FILE="${2-}"
+        [[ -z "$PACKAGE_FILE" ]] && die "Usage: olsp install <package.olsp>"
+        [[ ! -f "$PACKAGE_FILE" ]] && die "File not found: $PACKAGE_FILE"
+
+        # get plugin name from archive
+        PLUGIN_NAME="$(basename "$PACKAGE_FILE" .olsp)"
+        TARGET_DIR="$PLUGINS_DIR/$PLUGIN_NAME"
+
+        # clean old installation if exists
+        [[ -d "$TARGET_DIR" ]] && rm -rf "$TARGET_DIR"
+
+        # extract archive
+        mkdir -p "$TARGET_DIR"
+        tar -xzf "$PACKAGE_FILE" -C "$PLUGINS_DIR"
+
+        # validate package.json
+        [[ ! -f "$TARGET_DIR/package.json" ]] && die "package.json not found in package"
+
+        echo "Plugin '$PLUGIN_NAME' installed to $PLUGINS_DIR"
+        ols_log "Installed plugin: $PLUGIN_NAME"
+        ;;
+
+    # ----------------- LIST -----------------
+    list)
+        echo "Installed plugins:"
+        ls -1 "$PLUGINS_DIR"
+        ;;
+
+    *)
+        die "Unknown command: $1"
+        ;;
+esac
