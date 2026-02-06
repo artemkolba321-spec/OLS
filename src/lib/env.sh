@@ -1,2 +1,2 @@
 # OLS global var
-export OLS_VERSION="0.2.0"
+export OLS_VERSION="0.2.1"
