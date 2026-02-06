@@ -29,4 +29,8 @@ everything is ready
 3. **Designed for pipelines**  
    - All tools are pipeline-friendly, allowing chaining of commands effortlessly.  
    - Supports standard Linux streams (stdin/stdout/stderr) for maximum flexibility.
+4. **All packages are downloaded from the Internet.**
+   - no internet required
+   - predictability
+   - the user learns once
 
