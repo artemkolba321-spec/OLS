@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 # OLS init script
 
 set -euo pipefail
@@ -13,6 +13,7 @@ LOG_FILE="$OLS_DIR/logs.log"
 CONFIG_FILE="$HOME/.olsrc"
 PROFILE_FILE="$HOME/.profile"
 PLUGINS_DIR="$OLS_DIR/plugins"
+ASSETS_DIR="$OLS_DIR/assets"
 
 # ===== Logging =====
 ols_log() {
@@ -33,12 +34,13 @@ if [[ "$confirm" != "y" ]]; then
 fi
 
 # ===== Prepare filesystem =====
-mkdir -p "$OLS_DIR" "$OLS_BIN" "$OLS_LIB" "$OLS_SBIN" "$PLUGINS_DIR"
+mkdir -p "$OLS_DIR" "$OLS_BIN" "$OLS_LIB" "$OLS_SBIN" "$PLUGINS_DIR" "$ASSETS_DIR"
 touch "$LOG_FILE" "$CONFIG_FILE" "$PROFILE_FILE"
 
-chmod 644 "$LOG_FILE" "$CONFIG_FILE"
+chmod 644 "$LOG_FILE" "$CONFIG_FILE" 
 chmod 711 "$OLS_BIN" "$OLS_SBIN" "$PLUGINS_DIR"
 chmod 700 "$OLS_LIB" 
+chmod 751 "$ASSETS_DIR"
 
 
 ols_log "Installation started"
@@ -98,6 +100,15 @@ for lib in "$PWD/src/lib/"*; do
     chmod 700 "$OLS_LIB/$base"
     echo "Installed lib: $base"
     ols_log "Installed lib: $base"
+done
+
+for docs in "$PWD/docs/"*; do
+    [[ -f "$docs" ]] || continue
+    base="$(basename "$docs")"
+    cp "$docs" "$ASSETS_DIR/$base"
+    chmod 700 "$ASSETS_DIR/$base"
+    echo "Installed docs: $base"
+    ols_log "Installed docs: $base"
 done
 
 # ===== Done =====

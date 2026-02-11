@@ -1,0 +1,8 @@
+<svg width="1280" height="320" viewBox="0 0 1280 320" xmlns="http://www.w3.org/2000/svg">
+
+  <rect width="1280" height="320" fill="black"/>
+
+  <text x="50%" y="50%" font-size="120" font-family="Arial, sans-serif" fill="white" text-anchor="middle" dominant-baseline="middle">
+    &gt; ~ OLS
+  </text>
+</svg>
