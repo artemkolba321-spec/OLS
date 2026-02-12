@@ -26,15 +26,15 @@ mkdir -p "$PLUGINS_DIR"
 
 # ===== Main =====
 case "${1-}" in
-    # ----------------- INIT -----------------
     init)
-        PLUGIN_NAME="${2-}"
-        [[ -z "$PLUGIN_NAME" ]] && die "Usage: olsp init <plugin-name>"
-        [[ -d "$PLUGIN_NAME" ]] && die "Directory '$PLUGIN_NAME' already exists"
-
-        mkdir "$PLUGIN_NAME"
-        cd "$PLUGIN_NAME"
-
+        if [[ -n "${2-}" ]]; then
+            PLUGIN_NAME="$2"
+            [[ -d "$PLUGIN_NAME" ]] && die "Directory '$PLUGIN_NAME' already exists"
+            mkdir "$PLUGIN_NAME"
+            cd "$PLUGIN_NAME"
+        else
+            PLUGIN_NAME="$(basename "$PWD")"
+        fi
         # create package.json
         cat > package.json <<EOF
 {
@@ -69,8 +69,41 @@ EOF
 
         echo "Plugin '$PLUGIN_NAME' initialized successfully!"
         ;;
+    keygen)
+        PLUGIN_PATH="${2-}"
+        if [[ -z "$PLUGIN_PATH" ]]; then
+            PLUGIN_PATH="$PWD"
+        fi
 
-    # ----------------- BUILD -----------------
+        PLUGIN_PATH="$(realpath -m "$PLUGIN_PATH")"
+
+        [[ ! -d "$PLUGIN_PATH" ]] && die "Plugin not found: $PLUGIN_PATH"
+
+        PLUGIN_NAME="$(basename "$PLUGIN_PATH")"
+        KEY_DIR="$PLUGIN_PATH/keys"
+        KEY_FILE="$KEY_DIR/$PLUGIN_NAME.key"
+        PUB_FILE="$KEY_DIR/$PLUGIN_NAME.pub"
+
+        mkdir -p "$KEY_DIR"
+
+        if [[ ! -f "$PUB_FILE" ]]; then
+            PUB="$(head /dev/urandom | tr -dc 0-9 | head -c 10)"
+            echo "$PUB" > "$PUB_FILE"
+            echo "Public key generated: $PUB_FILE"
+        else
+            echo "Public key exists: $PUB_FILE"
+        fi
+
+        if [[ ! -f "$KEY_FILE" ]]; then
+            SECRET="OLS-$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 30)-d"
+            echo "$SECRET" > "$KEY_FILE"
+            echo "Secret key generated: $KEY_FILE"
+        else
+            echo "Secret key exists: $KEY_FILE"
+        fi
+
+        ols_log "Keys updated for plugin: $PLUGIN_PATH"
+        ;;
     build)
         PLUGIN_DIR="${2-}"
         [[ -z "$PLUGIN_DIR" ]] && die "Usage: olsp build <plugin-dir>"
@@ -87,7 +120,6 @@ EOF
         ;;
 
 
-    # ----------------- INSTALL -----------------
     install)
         PACKAGE_FILE="${2-}"
         [[ -z "$PACKAGE_FILE" ]] && die "Usage: olsp install <package.olsp>"
@@ -113,9 +145,14 @@ EOF
             echo "Package is missing keys."
             [[ ! -f "$KEY_FILE" ]] && echo "  - secret key (.key) not found"
             [[ ! -f "$PUB_FILE" ]] && echo "  - public key (.pub) not found"
+            echo "It is not recommended to download this package."
             printf "Do you really want to install this package? (y/N)"
             read -r answer
-            [[ "$answer" != "y" && "$answer" != "Y" ]] && echo "Installation cancelled"
+            if [[ "$answer" != "y" && "$answer" != "Y" ]]; then
+                echo "Installation cancelled"
+                rm -rf "$TARGET_DIR"
+                exit 1
+            fi
         else
             echo "Both keys found. Package trusted."
         fi
