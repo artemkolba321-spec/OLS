@@ -74,6 +74,8 @@ EOF
         if [[ -z "$PLUGIN_PATH" ]]; then
             PLUGIN_PATH="$PWD"
         fi
+        [[ ! -f "package.json" ]] && die "package.json not found"
+
 
         PLUGIN_PATH="$(realpath -m "$PLUGIN_PATH")"
 
@@ -108,7 +110,7 @@ EOF
         PLUGIN_DIR="${2-}"
         [[ -z "$PLUGIN_DIR" ]] && die "Usage: olsp build <plugin-dir>"
         [[ ! -d "$PLUGIN_DIR" ]] && die "Plugin directory not found"
-
+        [[ ! -f "package.json" ]] && die "package.json not found"
         PLUGIN_NAME="$(basename "$PLUGIN_DIR")"
         PARENT_DIR="$(dirname "$PLUGIN_DIR")"
 
