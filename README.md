@@ -31,7 +31,7 @@ everything is ready
    - All tools are pipeline-friendly, allowing chaining of commands effortlessly.  
    - Supports standard Linux streams (stdin/stdout/stderr) for maximum flexibility.
 4. **All packages are downloaded from the Internet.**
-   - no internet required
+   - Packages are downloaded once and can be used offline afterwards.
    - predictability
    - the user learns once
 
