@@ -164,8 +164,9 @@ interactive_shell() {
     echo "Welcome to OLS! (help — show help, exit — quit)"
 
     while true; do
+        DIR=$(basename "$PWD")
         OLD_IFS="$IFS"
-        IFS=' ' read -rp "ols> " -a input_words || break
+        IFS=' ' read -rp "ols-$DIR> " -a input_words || break
         IFS="$OLD_IFS"
 
         cmd="${input_words[0]-}"

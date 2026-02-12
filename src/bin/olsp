@@ -44,6 +44,21 @@ case "${1-}" in
 }
 EOF
 
+        SECRET="OLS-$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 30)-d"
+        PUB="$(head /dev/urandom | tr -dc 0-9 | head -c 10)"
+        
+        mkdir keys
+        touch keys/$PLUGIN_NAME.pub
+        touch keys/$PLUGIN_NAME.key
+        
+        echo "$PUB" > "keys/$PLUGIN_NAME.pub"
+        echo "$SECRET" > "keys/$PLUGIN_NAME.key"
+
+        cat > .gitignore <<EOF
+keys/$PLUGIN_NAME.key
+EOF
+        
+
         # create template plugin.lua
         cat > plugin.lua <<'EOF'
 print("Hello from plugin!")
@@ -78,6 +93,8 @@ EOF
         [[ -z "$PACKAGE_FILE" ]] && die "Usage: olsp install <package.olsp>"
         [[ ! -f "$PACKAGE_FILE" ]] && die "File not found: $PACKAGE_FILE"
 
+        
+
         # get plugin name from archive
         PLUGIN_NAME="$(basename "$PACKAGE_FILE" .olsp)"
         TARGET_DIR="$PLUGINS_DIR/$PLUGIN_NAME"
@@ -88,6 +105,20 @@ EOF
         # extract archive
         mkdir -p "$TARGET_DIR"
         tar -xzf "$PACKAGE_FILE" -C "$PLUGINS_DIR"
+
+        KEY_FILE="$TARGET_DIR/keys/$PLUGIN_NAME.key"
+        PUB_FILE="$TARGET_DIR/keys/$PLUGIN_NAME.pub"
+
+        if [[ ! -f "$KEY_FILE" || ! -f "$PUB_FILE" ]]; then
+            echo "Package is missing keys."
+            [[ ! -f "$KEY_FILE" ]] && echo "  - secret key (.key) not found"
+            [[ ! -f "$PUB_FILE" ]] && echo "  - public key (.pub) not found"
+            printf "Do you really want to install this package? (y/N)"
+            read -r answer
+            [[ "$answer" != "y" && "$answer" != "Y" ]] && echo "Installation cancelled"
+        else
+            echo "Both keys found. Package trusted."
+        fi
 
         # validate package.json
         [[ ! -f "$TARGET_DIR/package.json" ]] && die "package.json not found in package"
