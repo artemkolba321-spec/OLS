@@ -27,10 +27,25 @@ Usage: hp <command>
 
 Displays help information for OLS commands.
 
+Available commands:
+    gx           Git clone wrapper (clone repos by user/repo shorthand)
+    hp           Show help for any OLS command (this command)
+    lslog        View OLS activity logs
+    mkfile       Create files or directories
+    nurl         Download files from URLs (wget wrapper)
+    ols          Start the OLS interactive shell
+    olsp         OLS plugin manager
+    open         Open files with the default application
+    targz        Create or extract .tar.gz archives
+    uedit        Edit files with your preferred editor
+    ulog         Log messages to the OLS log file
+    xsystem     Execute system commands with logging
+
 Examples:
     hp gx        show help for gx
     hp lslog     show help for lslog
     hp mkfile    show help for mkfile
+    hp targz     show help for targz
 EOF
 }
 

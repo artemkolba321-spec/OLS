@@ -22,14 +22,24 @@ die() {
 # ===== Helpers =====
 show_help() {
     cat <<'EOF'
-nurl - Net URL Load
+nurl - Net URL Load (download files from the web)
 
 usage:
-	nurl <URL>
+    nurl <URL>         Download a file from the given URL
+    nurl --help        Show this help message
+
+description:
+    Downloads files from HTTP/HTTPS URLs using wget.
+    The file is saved to the current directory.
+    You can also pipe the output to other commands.
+
+requires:
+    wget
+
 examples:
-    nurl https://example.com/file.zip
-    nurl https://example.com/ > index.html
-    nurl https://example.com/ | less
+    nurl https://example.com/file.zip         download a file
+    nurl https://example.com/ > index.html    save page as HTML
+    nurl https://example.com/ | less          view page content
 EOF
 }
 
