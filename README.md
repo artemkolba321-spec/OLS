@@ -1,5 +1,5 @@
 # OLS v0.2.2
-![OLS Banner](docs/banner.svg)
+![OLS Banner](docs/banner.svg)<br>
 OLS (Open Linux Shell) - This is a project aimed at improving the work with the terminal.
 
 ## installation
@@ -30,8 +30,10 @@ everything is ready
 3. **Designed for pipelines**  
    - All tools are pipeline-friendly, allowing chaining of commands effortlessly.  
    - Supports standard Linux streams (stdin/stdout/stderr) for maximum flexibility.
+
 4. **All packages are downloaded from the Internet.**
    - Packages are downloaded once and can be used offline afterwards.
    - predictability
    - the user learns once
+
 
