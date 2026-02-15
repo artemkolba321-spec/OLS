@@ -140,22 +140,21 @@ ols_doctor() {
 
 
 # ===== Update =====
-ols_update() {
-    command -v git >/dev/null 2>&1 || die "Git not found"
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
 
-    if [[ ! -d "$OLS_DIR/.git" ]]; then
-        die "OLS directory is not a git repository"
-    fi
+OLS_DIR="${OLS_DIR:-$HOME/OLS}"
+LOG_FILE="${LOG_FILE:-$OLS_DIR/logs.log}"
 
-    echo "Updating OLS..."
-    ols_log "OLS update started"
+ols_log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][update] $@" >> "$LOG_FILE"
+}
 
-    if git -C "$OLS_DIR" pull --ff-only; then
-        echo "OLS updated successfully"
-        ols_log "OLS update successful"
-    else
-        die "Failed to update OLS"
-    fi
+die() {
+    echo "Error: $@" >&2
+    ols_log "EE: $@"
+    exit 1
 }
 
 # ===== Interactive shell =====
@@ -228,9 +227,6 @@ case "${1-}" in
         ;;
     doctor)
         ols_doctor
-        ;;
-    update)
-        ols_update
         ;;
     "")
         interactive_shell
