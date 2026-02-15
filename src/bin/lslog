@@ -10,15 +10,23 @@ LOG_FILE="$HOME/OLS/logs.log"
 # ===== Help =====
 show_help() {
 	cat <<'EOF'
+lslog - View OLS activity logs
+
 usage:
-    lslog
+    lslog              Display all log entries
+    lslog --help       Show this help message
+
 description:
-	This is a small utility 
-	for viewing logs.
+    Prints the contents of the OLS log file (~/.OLS/logs.log).
+    Each log entry includes a timestamp, component name, and message.
+    Pipe the output to filter, sort, or search log entries.
+
 examples:
-	lslog
-	lslog | sort | uniq
-	lslog | grep EE
+    lslog                    show all logs
+    lslog | grep EE          show only errors
+    lslog | grep gx          show only gx command logs
+    lslog | tail -20         show the last 20 log entries
+    lslog | sort | uniq      show unique log entries
 EOF
 }
 

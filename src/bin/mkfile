@@ -22,18 +22,28 @@ die() {
 # ===== Help =====
 show_help() {
     cat <<'EOF'
+mkfile - Create files and directories
+
 usage:
-    mkfile <-f|-d> <filename>
+    mkfile -f <filename> [<filename>...]    Create one or more files
+    mkfile -d <dirname> [<dirname>...]      Create one or more directories
+    mkfile --help                           Show this help message
+
 description:
-    This is a small utility 
-    for creating files and directories.
+    A utility for quickly creating files (touch) or directories (mkdir -p).
+    Files must not already exist (prevents accidental overwrites).
+    Directories are created with -p (parent dirs created as needed).
+
 options:
-    -f         create file 
-    -d         create directory
-    --help     show help
+    -f         Create empty file(s) (fails if file already exists)
+    -d         Create directory/directories (creates parents if needed)
+    --help     Show this help message
+
 examples:
-    mkfile -f text.txt
-    mkfile -d directory/
+    mkfile -f text.txt                 create a single file
+    mkfile -f a.txt b.txt c.txt        create multiple files
+    mkfile -d myproject                create a directory
+    mkfile -d src/components/ui        create nested directories
 EOF
 }
 
