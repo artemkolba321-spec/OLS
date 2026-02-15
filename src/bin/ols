@@ -113,7 +113,7 @@ ols_doctor() {
 
     SYSTEM_DIRS=("$OLS_DIR" "$BIN_DIR")
     SYSTEM_FILES=("$LOG_FILE" "$HOME/.olsrc")
-    DEPENDENCIES=(git wget bash tar touch mkdir tree lua jq) 
+    DEPENDENCIES=(git wget bash tree lua jq) 
 
     # ===== Check directories =====
     for dir in "${SYSTEM_DIRS[@]}"; do
@@ -224,7 +224,7 @@ case "${1-}" in
         show_help
         ;;
     --version)
-        echo $OLS_VERSION
+        echo "$OLS_VERSION"
         ;;
     doctor)
         ols_doctor
@@ -235,18 +235,21 @@ case "${1-}" in
     "")
         interactive_shell
         ;;
-    *)
-        if [[ "${1-}" == *.ols ]]; then
-            FILE="$1"
-            shift || true
+    *.ols)
+        FILE="$1"
+        shift || true
 
-            if [[ ! -f "$FILE" ]]; then
-                die "File not found: $FILE"
-            fi
-
-            bash "$FILE" "$@"
-        else
-            die "Unknown command: $1"
+        # Normalize path
+        if [[ "$FILE" != /* ]]; then
+            FILE="$(realpath "$FILE")"
         fi
+
+        [[ ! -f "$FILE" ]] && die "File not found: $FILE"
+
+        bash "$FILE" "$@"
+        ;;
+    *)
+        die "Unknown command: $1"
         ;;
 esac
+
