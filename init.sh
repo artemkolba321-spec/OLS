@@ -111,9 +111,21 @@ for docs in "$PWD/docs/"*; do
     ols_log "Installed docs: $base"
 done
 
+# ===== Add daemon auto-start =====
+DAEMON_CMD="python3 $OLS_LIB/olsd.py &"
+if ! grep -Fxq "$DAEMON_CMD" "$PROFILE_FILE" 2>/dev/null; then
+    echo "" >> "$PROFILE_FILE"
+    echo "# Start OLS update daemon on login" >> "$PROFILE_FILE"
+    echo "$DAEMON_CMD" >> "$PROFILE_FILE"
+    ols_log "Added update daemon to $PROFILE_FILE"
+fi
+
 # ===== Done =====
 echo
 echo "OLS installation complete."
+echo
+echo "Install required Python packages globally:"
+echo "  pip install --user requests plyer python-daemon"
 echo
 echo "To apply changes now, run:"
 echo "  source $SHELL_RC"
