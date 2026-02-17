@@ -35,10 +35,4 @@ everything is ready
    - Packages are downloaded once and can be used offline afterwards.
    - predictability
    - the user learns once
-  
-5. **Self-updating by the user**
-   - The package is updated manually by the author, ensuring full control and stability.
-   - No automatic updates — every change is deliberate and tested.
-   - Users always get a stable and predictable experience.
-
 
