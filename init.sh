@@ -89,12 +89,12 @@ for lib in "$PWD/src/lib/"*; do
     echo "Installed lib: $base"
 done
 
-for docs in "$PWD/docs/"*; do
-    [[ -f "$docs" ]] || continue
-    base="$(basename "$docs")"
-    cp "$docs" "$ASSETS_DIR/$base"
+for assets in "$PWD/assets/"*; do
+    [[ -f "$assets" ]] || continue
+    base="$(basename "$assets")"
+    cp "$assets" "$ASSETS_DIR/$base"
     chmod 700 "$ASSETS_DIR/$base"
-    echo "Installed docs: $base"
+    echo "Installed assets: $base"
 done
 
 # ===== Add daemon auto-start =====
