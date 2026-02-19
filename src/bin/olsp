@@ -151,8 +151,15 @@ EOF
         echo "Plugin '$PLUGIN_NAME' installed to $PLUGINS_DIR"
         info "Installed plugin: $PLUGIN_NAME"
         ;;
-
-    # ----------------- LIST -----------------
+    uninstall)
+        PLUGIN_NAME="${2-}"
+        [[ -z "$PLUGIN_NAME" ]] && warn "Usage: olsp uninstall <plugin-name>"
+        TARGET_DIR="$PLUGINS_DIR/$PLUGIN_NAME"
+        [[ ! -d "$TARGET_DIR" ]] && warn "Plugin not found"
+        rm -rf "$TARGET_DIR"
+        echo "Plugin '$PLUGIN_NAME' removed"
+        info "Uninstalled plugin: $PLUGIN_NAME"
+        ;;
     list)
         echo "Installed plugins:"
         ls -1 "$PLUGINS_DIR"
