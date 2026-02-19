@@ -5,21 +5,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# ===== Logging =====
-OLS_DIR="${OLS_DIR:-$HOME/OLS}"
-PLUGINS_DIR="$OLS_DIR/plugins"
-LOG_FILE="$OLS_DIR/logs.log"
-
-# ===== Helpers =====
-ols_log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][olsp] $@" >> "$LOG_FILE"
-}
-
-die() {
-    echo "olsp: $@" >&2
-    ols_log "EE: $@"
-    exit 1
-}
+source "$HOME/OLS/lib/env.sh"
 
 # ===== Ensure plugins dir exists =====
 mkdir -p "$PLUGINS_DIR"
@@ -29,7 +15,7 @@ case "${1-}" in
     init)
         if [[ -n "${2-}" ]]; then
             PLUGIN_NAME="$2"
-            [[ -d "$PLUGIN_NAME" ]] && die "Directory '$PLUGIN_NAME' already exists"
+            [[ -d "$PLUGIN_NAME" ]] && warn "Directory '$PLUGIN_NAME' already exists"
             mkdir "$PLUGIN_NAME"
             cd "$PLUGIN_NAME"
         else
@@ -74,12 +60,12 @@ EOF
         if [[ -z "$PLUGIN_PATH" ]]; then
             PLUGIN_PATH="$PWD"
         fi
-        [[ ! -f "package.json" ]] && die "package.json not found"
+        [[ ! -f "package.json" ]] && ee "package.json not found"
 
 
         PLUGIN_PATH="$(realpath -m "$PLUGIN_PATH")"
 
-        [[ ! -d "$PLUGIN_PATH" ]] && die "Plugin not found: $PLUGIN_PATH"
+        [[ ! -d "$PLUGIN_PATH" ]] && warn "Plugin not found: $PLUGIN_PATH"
 
         PLUGIN_NAME="$(basename "$PLUGIN_PATH")"
         KEY_DIR="$PLUGIN_PATH/keys"
@@ -104,13 +90,13 @@ EOF
             echo "Secret key exists: $KEY_FILE"
         fi
 
-        ols_log "Keys updated for plugin: $PLUGIN_PATH"
+        info "Keys updated for plugin: $PLUGIN_PATH"
         ;;
     build)
         PLUGIN_DIR="${2-}"
-        [[ -z "$PLUGIN_DIR" ]] && die "Usage: olsp build <plugin-dir>"
-        [[ ! -d "$PLUGIN_DIR" ]] && die "Plugin directory not found"
-        [[ ! -f "package.json" ]] && die "package.json not found"
+        [[ -z "$PLUGIN_DIR" ]] && warn "Usage: olsp build <plugin-dir>"
+        [[ ! -d "$PLUGIN_DIR" ]] && warn "Plugin directory not found"
+        [[ ! -f "package.json" ]] && ee "package.json not found"
         PLUGIN_NAME="$(basename "$PLUGIN_DIR")"
         PARENT_DIR="$(dirname "$PLUGIN_DIR")"
 
@@ -124,8 +110,8 @@ EOF
 
     install)
         PACKAGE_FILE="${2-}"
-        [[ -z "$PACKAGE_FILE" ]] && die "Usage: olsp install <package.olsp>"
-        [[ ! -f "$PACKAGE_FILE" ]] && die "File not found: $PACKAGE_FILE"
+        [[ -z "$PACKAGE_FILE" ]] && warn "Usage: olsp install <package.olsp>"
+        [[ ! -f "$PACKAGE_FILE" ]] && warn "File not found: $PACKAGE_FILE"
 
         
 
@@ -163,7 +149,7 @@ EOF
         [[ ! -f "$TARGET_DIR/package.json" ]] && die "package.json not found in package"
 
         echo "Plugin '$PLUGIN_NAME' installed to $PLUGINS_DIR"
-        ols_log "Installed plugin: $PLUGIN_NAME"
+        info "Installed plugin: $PLUGIN_NAME"
         ;;
 
     # ----------------- LIST -----------------
@@ -173,6 +159,6 @@ EOF
         ;;
 
     *)
-        die "Unknown command: $1"
+        info "Unknown command: $1"
         ;;
 esac

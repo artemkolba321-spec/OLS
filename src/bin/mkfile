@@ -4,20 +4,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# ===== Paths =====
-OLS_DIR="$HOME/OLS"
-LOG_FILE="$OLS_DIR/logs.log"
-
-# ===== Logging =====
-ols_log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][mkfile] $@" >> "$LOG_FILE"
-}
-
-die() {
-    echo "mkfile: $@" >&2
-    ols_log "EE: $@"
-    exit 1
-}
+source "$HOME/OLS/lib/env.sh"
 
 # ===== Help =====
 show_help() {
@@ -49,7 +36,7 @@ EOF
 
 # ===== Args =====
 [[ $# -eq 0 ]] && show_help && exit 0
-[[ -z "${2-}" ]] && die "Missing filename or directory name"
+[[ -z "${2-}" ]] && warn "Missing filename or directory name" && exit 1
 
 if [[ "$1" == "--help" ]]; then
     show_help
@@ -60,21 +47,21 @@ fi
 case "$1" in
     -d)
         for dir in "${@:2}"; do
-            mkdir -p "$dir" || die "Failed to create directory $dir"
-            ols_log "Created directory: $dir"
+            mkdir -p "$dir" || ee "Failed to create directory $dir"
+            info "Created directory: $dir"
         done
         ;;
     -f)
         for file in "${@:2}"; do
-            [[ -e "$file" ]] && die "File already exists: $file"
-            touch "$file" || die "Failed to create file $file"
-            ols_log "Created file: $file"
+            [[ -e "$file" ]] && ee "File already exists: $file"
+            touch "$file" || ee "Failed to create file $file"
+            info "Created file: $file"
         done
 
         ;;
     *)
-        die "Invalid argument: $1"
+        ee "Invalid argument: $1"
         ;;
 esac
 
-ols_log "exec: $@"
+info "exec: $@"

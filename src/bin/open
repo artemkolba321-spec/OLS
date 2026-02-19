@@ -4,14 +4,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# ===== Paths =====
-OLS_DIR="$HOME/OLS"
-LOG_FILE="$OLS_DIR/logs.log"
+source "$HOME/OLS/lib/env.sh"
 
-# ===== Logging =====
-ols_log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][open] $@" >> "$LOG_FILE"
-}
 
 # ===== Helpers =====
 show_help() {
@@ -32,19 +26,12 @@ examples:
     open -c newfile.txt
 EOF
 }
-
-die() {
-    echo "open: $@" >&2
-    ols_log "EE: $@"
-    exit 1
-}
-
 # ===== Requirements =====
 command -v xdg-open >/dev/null 2>&1 \
     || die "xdg-open not found (required)"
 
 # ===== Main =====
-ols_log "exec: $*"
+info "exec: $@"
 
 [[ $# -eq 0 ]] && show_help && exit 1
 
@@ -54,28 +41,28 @@ case "$1" in
         exit 0
         ;;
     -c)
-        [[ $# -lt 2 ]] && die "missing target for -c"
+        [[ $# -lt 2 ]] && warn "missing target for -c"
         TARGET="$2"
 
         if [[ -e "$TARGET" ]]; then
-            ols_log "target already exists: $TARGET"
+            info "target already exists: $TARGET"
             echo "target already exists: $TARGET"
         else
             if [[ "$TARGET" == */ ]]; then
                 mkdir -p "$TARGET"
-                ols_log "created directory: $TARGET"
+                info "created directory: $TARGET"
             else
                 touch "$TARGET"
-                ols_log "created file: $TARGET"
+                info "created file: $TARGET"
             fi
         fi
 
         xdg-open "$TARGET"
-        ols_log "opened: $TARGET"
+        info "opened: $TARGET"
         ;;
     *)
         TARGET="$1"
         xdg-open "$TARGET"
-        ols_log "opened: $TARGET"
+        info "opened: $TARGET"
         ;;
 esac

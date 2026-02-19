@@ -4,20 +4,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# ===== Paths =====
-OLS_DIR="$HOME/OLS"
-LOG_FILE="$OLS_DIR/logs.log"
-
-# ===== Logging =====
-ols_log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][targz] $@" >> "$LOG_FILE"
-}
-
-die() {
-    echo "targz: $@" >&2
-    ols_log "EE: $@"
-    exit 1
-}
+source "$HOME/OLS/lib/env.sh"
 
 # ===== Help =====
 show_help() {
@@ -47,7 +34,7 @@ if [[ "$1" == "--help" ]]; then
 fi
 
 # ===== Check tar =====
-command -v tar >/dev/null 2>&1 || die "tar command not found"
+command -v tar >/dev/null 2>&1 || warn "tar command not found"
 
 # ===== Parse arguments =====
 MODE="create"
@@ -58,13 +45,13 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         -o)
             shift
-            [[ $# -eq 0 ]] && die "Missing archive name after -o"
+            [[ $# -eq 0 ]] && warn "Missing archive name after -o"
             OUTPUT="$1"
             ;;
         -x)
             MODE="extract"
             shift
-            [[ $# -eq 0 ]] && die "Missing archive file to extract after -x"
+            [[ $# -eq 0 ]] && warn "Missing archive file to extract after -x"
             FILES+=("$1")
             ;;
         *)
@@ -76,17 +63,17 @@ done
 
 # ===== Execute =====
 if [[ "$MODE" == "create" ]]; then
-    [[ ${#FILES[@]} -gt 0 ]] || die "No files or directories specified to archive"
+    [[ ${#FILES[@]} -gt 0 ]] || warn "No files or directories specified to archive"
     [[ -z "$OUTPUT" ]] && OUTPUT="${FILES[0]}.tar.gz"
-    tar -czf "$OUTPUT" "${FILES[@]}" || die "Failed to create archive $OUTPUT"
-    ols_log "Created archive $OUTPUT from: ${FILES[*]}"
+    tar -czf "$OUTPUT" "${FILES[@]}" || ee "Failed to create archive $OUTPUT"
+    info "Created archive $OUTPUT from: ${FILES[*]}"
     echo "Archive created: $OUTPUT"
 else
     ARCHIVE="${FILES[0]}"
-    [[ -f "$ARCHIVE" ]] || die "Archive file $ARCHIVE not found"
+    [[ -f "$ARCHIVE" ]] || warn "Archive file $ARCHIVE not found"
     DIR_NAME="$(basename "$ARCHIVE" .tar.gz)"
     mkdir -p "$DIR_NAME"
-    tar -xzf "$ARCHIVE" -C "$DIR_NAME" || die "Failed to extract $ARCHIVE"
-    ols_log "Extracted archive $ARCHIVE into $DIR_NAME"
+    tar -xzf "$ARCHIVE" -C "$DIR_NAME" || ee "Failed to extract $ARCHIVE"
+    info "Extracted archive $ARCHIVE into $DIR_NAME"
     echo "Archive extracted into: $DIR_NAME"
 fi

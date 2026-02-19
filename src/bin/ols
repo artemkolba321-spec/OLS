@@ -4,21 +4,7 @@
 set -u
 IFS=$'\n\t'
 
-# ===== Paths =====
-OLS_DIR="${OLS_DIR:-$HOME/OLS}"
-BIN_DIR="${BIN_DIR:-$OLS_DIR/bin}"
-LOG_FILE="${LOG_FILE:-$OLS_DIR/logs.log}"
-
-# ===== Logging =====
-ols_log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS] $@" >> "$LOG_FILE"
-}
-
-die() {
-    echo "Error: $@" >&2
-    ols_log "EE: $@"
-    exit 1
-}
+source "$HOME/OLS/lib/env.sh"
 
 # ===== Help =====
 show_help() {
@@ -138,28 +124,9 @@ ols_doctor() {
     echo "  FAIL: $fail_count"
 }
 
-
-# ===== Update =====
-#!/usr/bin/env bash
-set -euo pipefail
-IFS=$'\n\t'
-
-OLS_DIR="${OLS_DIR:-$HOME/OLS}"
-LOG_FILE="${LOG_FILE:-$OLS_DIR/logs.log}"
-
-ols_log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][update] $@" >> "$LOG_FILE"
-}
-
-die() {
-    echo "Error: $@" >&2
-    ols_log "EE: $@"
-    exit 1
-}
-
 # ===== Interactive shell =====
 interactive_shell() {
-    ols_log "Interactive shell started"
+    info "Interactive shell started"
     echo "Welcome to OLS! (help — show help, exit — quit)"
 
     while true; do
@@ -172,7 +139,7 @@ interactive_shell() {
         args=("${input_words[@]:1}")
         case "$cmd" in
             exit)
-                ols_log "Shell exited"
+                info "Shell exited"
                 echo "Goodbye!"
                 break
                 ;;
@@ -210,7 +177,7 @@ interactive_shell() {
                 fi
 
                 echo "Unknown command: $cmd"
-                ols_log "Unknown command: $cmd"
+                ee "Unknown command: $cmd"
                 ;;
         esac
     done
@@ -245,7 +212,7 @@ case "${1-}" in
         bash "$FILE" "$@"
         ;;
     *)
-        die "Unknown command: $1"
+        ee "Unknown command: $1"
         ;;
 esac
 

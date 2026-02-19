@@ -15,11 +15,6 @@ PROFILE_FILE="$HOME/.profile"
 PLUGINS_DIR="$OLS_DIR/plugins"
 ASSETS_DIR="$OLS_DIR/assets"
 
-# ===== Logging =====
-ols_log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS] $@" >> "$LOG_FILE"
-}
-
 # ===== Safety prompt =====
 echo -e "Warning: Installing OLS may modify your shell configuration files."
 printf "Are you sure you want to continue? [y/N]: "
@@ -42,9 +37,6 @@ chmod 711 "$OLS_BIN" "$OLS_SBIN" "$PLUGINS_DIR"
 chmod 700 "$OLS_LIB" 
 chmod 751 "$ASSETS_DIR"
 
-
-ols_log "Installation started"
-
 # ===== Detect shell =====
 if [[ -n "${BASH_VERSION-}" ]]; then
     SHELL_RC="$HOME/.bashrc"
@@ -58,7 +50,6 @@ fi
 PATH_LINE="export PATH=\"$OLS_BIN:\$PATH\""
 if ! grep -Fxq "$PATH_LINE" "$SHELL_RC" 2>/dev/null; then
     echo "$PATH_LINE" >> "$SHELL_RC"
-    ols_log "Added OLS/bin to PATH in $SHELL_RC"
 fi
 
 ENV_LINE="source \"\$HOME/OLS/lib/env.sh\""
@@ -77,7 +68,6 @@ OLS_BIN="$OLS_DIR/bin"
 # Default editor
 export EDITOR=nano
 EOF
-    ols_log "Created default ~/.olsrc"
 fi
 
 
@@ -87,9 +77,7 @@ for cmd in "$PWD/src/bin/"*; do
     base="$(basename "$cmd")"
     cp "$cmd" "$OLS_BIN/$base"
     chmod 755 "$OLS_BIN/$base"
-    echo "Installed bin: $base"
-    ols_log "Installed bin: $base"
-    
+    echo "Installed bin: $base"    
 done
 
 # ===== Install lib files =====
@@ -99,7 +87,6 @@ for lib in "$PWD/src/lib/"*; do
     cp "$lib" "$OLS_LIB/$base"
     chmod 700 "$OLS_LIB/$base"
     echo "Installed lib: $base"
-    ols_log "Installed lib: $base"
 done
 
 for docs in "$PWD/docs/"*; do
@@ -108,7 +95,6 @@ for docs in "$PWD/docs/"*; do
     cp "$docs" "$ASSETS_DIR/$base"
     chmod 700 "$ASSETS_DIR/$base"
     echo "Installed docs: $base"
-    ols_log "Installed docs: $base"
 done
 
 # ===== Add daemon auto-start =====
@@ -132,5 +118,3 @@ echo "  source $SHELL_RC"
 echo "  source $PROFILE_FILE"
 echo
 echo "Or just restart your terminal."
-
-ols_log "Installation finished"

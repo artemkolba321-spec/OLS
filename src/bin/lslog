@@ -17,7 +17,7 @@ usage:
     lslog --help       Show this help message
 
 description:
-    Prints the contents of the OLS log file (~/.OLS/logs.log).
+    Prints the contents of the OLS log file (~/OLS/logs.log).
     Each log entry includes a timestamp, component name, and message.
     Pipe the output to filter, sort, or search log entries.
 
@@ -36,12 +36,15 @@ case "${1-}" in
         show_help
         exit 0
         ;;
+    -G|--global)
+        if command -v journalctl >/dev/null 2>&1; then
+            journalctl -k
+        else
+            dmesg
+        fi
+        ;;
+    *)
+    cat "$LOG_FILE"
 esac
 
-# ===== Main =====
-if [[ ! -f "$LOG_FILE" ]]; then
-    echo "lslog: log file not found: $LOG_FILE" >&2
-    exit 1
-fi
 
-cat "$LOG_FILE"

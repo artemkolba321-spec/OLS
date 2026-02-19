@@ -4,19 +4,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# ===== logging =====
-OLS_DIR="$HOME/OLS"
-LOG_FILE="$OLS_DIR/logs.ols"
-
-ols_log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][gx] $@" >> "$LOG_FILE"
-}
-
-die() {
-    echo "gx: $@" >&2
-    ols_log "EE: $@"
-    exit 1
-}
+source "$HOME/OLS/lib/env.sh"
 
 # ===== Help =====
 if [[ $# -eq 0 || "$1" == "--help" ]]; then
@@ -54,11 +42,11 @@ fi
 # If directory exists, skip cloning
 if [[ -d "$dir" ]]; then
     echo "gx: directory '$dir' already exists, skipping clone"
-    ols_log "Skip clone: $dir exists"
+    warn "Skip clone: $dir exists"
     exit 0
 fi
 
 # Clone repository
-git clone "$url" "$dir" || die "failed to clone $url"
+git clone "$url" "$dir" || ee "failed to clone $url"
 echo "gx: cloned repository '$dir'"
-ols_log "Cloned repository $dir"
+info "Cloned repository $dir"

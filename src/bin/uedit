@@ -9,4 +9,4 @@ EDITOR="${EDITOR:-nano}"
 echo "Opening $FILE with $EDITOR..."
 "$EDITOR" "$FILE"
 
-echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][uedit] Edited $FILE using $EDITOR" >> "$LOG_FILE"
+echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][uedit][INFO] Edited $FILE using $EDITOR" >> "$LOG_FILE"

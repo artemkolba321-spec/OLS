@@ -4,20 +4,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# ===== Paths =====
-OLS_DIR="$HOME/OLS"
-LOG_FILE="$OLS_DIR/logs.log"
-
-# ===== Logging =====
-ols_log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][nurl] $@" >> "$LOG_FILE"
-}
-
-die() {
-    echo "nurl: $@" >&2
-    ols_log "EE: $@"
-    exit 1
-}
+source "$HOME/OLS/lib/env.sh"
 
 # ===== Helpers =====
 show_help() {
@@ -46,7 +33,7 @@ EOF
 
 # ===== Args =====
 [[ $# -eq 0 ]] && show_help && exit 0
-command -v wget >/dev/null 2>&1 || die "wget not found"
+command -v wget >/dev/null 2>&1 || warn "wget not found"
 
 # ===== Main =====
 case "$1" in
@@ -57,9 +44,9 @@ case "$1" in
     *)
         if [[ "$1" == http://* || "$1" == https://* ]]; then
             wget "$1"
-            ols_log "fetch $1"
+            info "fetch $1"
         else
-            die "invalid argument: $1"
+            ee "invalid argument: $1"
         fi
         ;;
 esac

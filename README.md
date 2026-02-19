@@ -1,4 +1,4 @@
-# OLS v0.2.2
+# OLS v0.3.0
 ![OLS Banner](docs/banner.svg)<br>
 OLS (Open Linux Shell) - This is a project aimed at improving the work with the terminal.
 
