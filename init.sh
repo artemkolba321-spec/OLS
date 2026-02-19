@@ -103,7 +103,6 @@ if ! grep -Fxq "$DAEMON_CMD" "$PROFILE_FILE" 2>/dev/null; then
     echo "" >> "$PROFILE_FILE"
     echo "# Start OLS update daemon on login" >> "$PROFILE_FILE"
     echo "$DAEMON_CMD" >> "$PROFILE_FILE"
-    ols_log "Added update daemon to $PROFILE_FILE"
 fi
 
 # ===== Done =====
