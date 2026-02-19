@@ -104,7 +104,7 @@ EOF
         tar -czf "$PLUGIN_NAME.olsp" -C "$PARENT_DIR" "$PLUGIN_NAME"
 
         echo "Plugin built: $PLUGIN_NAME.olsp"
-        ols_log "Built plugin: $PLUGIN_NAME"
+        info "Built plugin: $PLUGIN_NAME"
         ;;
 
 
@@ -146,7 +146,7 @@ EOF
         fi
 
         # validate package.json
-        [[ ! -f "$TARGET_DIR/package.json" ]] && die "package.json not found in package"
+        [[ ! -f "$TARGET_DIR/package.json" ]] &&  "package.json not found in package"
 
         echo "Plugin '$PLUGIN_NAME' installed to $PLUGINS_DIR"
         info "Installed plugin: $PLUGIN_NAME"

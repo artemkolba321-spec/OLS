@@ -22,7 +22,7 @@ EOF
     exit 0
 fi
 
-command -v git >/dev/null 2>&1 || die "Git not found"
+command -v git >/dev/null 2>&1 || warn "Git not found"
 
 # ===== Main =====
 repo="$1"

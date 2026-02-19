@@ -207,7 +207,7 @@ case "${1-}" in
             FILE="$(realpath "$FILE")"
         fi
 
-        [[ ! -f "$FILE" ]] && die "File not found: $FILE"
+        [[ ! -f "$FILE" ]] && warn "File not found: $FILE"
 
         bash "$FILE" "$@"
         ;;
