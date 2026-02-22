@@ -1,5 +1,5 @@
 # OLS v0.3.1
-![OLS Banner](docs/banner.svg)<br>
+![OLS Banner](assets/banner.svg)<br>
 OLS (Open Linux Shell) - This is a project aimed at improving the work with the terminal.
 
 ## installation
@@ -8,14 +8,20 @@ clone the code
 $ git clone git@github.com:artemkolba321-spec/OLS.git
 $ cd OLS
 ```
-next initialization
-- if Bash
+next installation
 ```Bash
-$ bash ./init.sh
+make
 ```
-- if Zsh
+next add to end .bashrc or .zshrc
 ```Bash
-$ zsh ./init.sh
+export PATH="$HOME/.local/share/OLS/bin:$PATH"
+source "$HOME/.local/share/OLS/lib/env.sh"
+```
+Then reload your shell:
+```Bash
+source ~/.bashrc
+# or
+source ~/.zshrc
 ```
 everything is ready
 ## philosophy
