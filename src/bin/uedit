@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # OLS command: uedit
-OLS_DIR="$HOME/OLS"
+OLS_DIR="$HOME/.local/OLS"
 LOG_FILE="$OLS_DIR/logs.log"
 FILE="$1"
 

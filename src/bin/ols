@@ -4,7 +4,7 @@
 set -u
 IFS=$'\n\t'
 
-source "$HOME/OLS/lib/env.sh"
+source "$HOME/.local/OLS/lib/env.sh"
 
 # ===== Help =====
 show_help() {
@@ -24,6 +24,72 @@ interactive:
     doctor           - run diagnostics
     <command> [args] - run system command
 EOF
+}
+
+ols_update() {
+    mode="update"
+    branch="lts"  # по умолчанию LTS
+    for arg in "$@"; do
+        case "$arg" in
+            --check) mode="check" ;;
+            --force) mode="force" ;;
+            --nolts) branch="main" ;;
+            *) ;;
+        esac
+    done
+
+    REPO="artemkolba321-spec/OLS"
+    TMP_DIR=$(mktemp -d)
+    STATE_FILE="$HOME/.local/share/ols/state.json"
+    mkdir -p "$(dirname "$STATE_FILE")"
+
+    if [[ "$branch" == "lts" ]]; then
+        LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/tags" | \
+                     grep '"name":' | grep 'lts' | head -n1 | sed -E 's/.*"([^"]+)".*/\1/')
+        [[ -z "$LATEST_TAG" ]] && { echo "Cannot fetch latest LTS."; return 1; }
+        REF="$LATEST_TAG"
+    else
+        LATEST_SHA=$(curl -s "https://api.github.com/repos/$REPO/commits/main" | \
+                     grep '"sha":' | head -n1 | sed -E 's/.*"([^"]+)".*/\1/')
+        [[ -z "$LATEST_SHA" ]] && { echo "Cannot fetch latest main commit."; return 1; }
+        REF="$LATEST_SHA"
+    fi
+
+    CURRENT_REF=$(jq -r '.last_ref // ""' "$STATE_FILE" 2>/dev/null || echo "")
+
+    if [[ "$mode" == "check" ]]; then
+        if [[ "$REF" != "$CURRENT_REF" ]]; then
+            echo "Update available: $REF (current: $CURRENT_REF)"
+        else
+            echo "Already up to date: $CURRENT_REF"
+        fi
+        return 0
+    fi
+
+    if [[ "$mode" == "update" && "$REF" == "$CURRENT_REF" ]]; then
+        echo "Already up to date: $CURRENT_REF"
+        return 0
+    fi
+
+    echo "Downloading OLS ($branch) $REF..."
+    if [[ "$branch" == "lts" ]]; then
+        curl -L "https://github.com/$REPO/archive/refs/tags/$REF.tar.gz" -o "$TMP_DIR/ols.tar.gz"
+        TAR_DIR="$TMP_DIR/OLS-$REF"
+    else
+        curl -L "https://github.com/$REPO/archive/refs/heads/main.tar.gz" -o "$TMP_DIR/ols.tar.gz"
+        TAR_DIR="$TMP_DIR/OLS-main"
+    fi
+    tar -xzf "$TMP_DIR/ols.tar.gz" -C "$TMP_DIR"
+
+    echo "Installing..."
+    cp -r "$TAR_DIR/src/bin/"* "$OLS_DIR/bin/"
+    cp -r "$TAR_DIR/src/lib/"* "$OLS_DIR/lib/"
+    cp -r "$TAR_DIR/assets/"* "$OLS_DIR/assets/"
+
+    echo "{\"last_check\":$(date +%s),\"last_ref\":\"$REF\"}" > "$STATE_FILE"
+    echo "OLS updated to $REF"
+
+    rm -rf "$TMP_DIR"
 }
 
 # ===== Doctor =====
@@ -194,6 +260,9 @@ case "${1-}" in
         ;;
     doctor)
         ols_doctor
+        ;;
+    update)
+        ols_update $@
         ;;
     "")
         interactive_shell

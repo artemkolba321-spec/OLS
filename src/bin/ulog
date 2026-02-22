@@ -4,7 +4,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-LOG_FILE="$HOME/OLS/logs.log"
+LOG_FILE="$HOME/.local/OLS/logs.log"
 
 die() {
     echo "ulog: $@" >&2

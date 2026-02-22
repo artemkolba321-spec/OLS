@@ -4,7 +4,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-source "$HOME/OLS/lib/env.sh"
+source "$HOME/.local/OLS/lib/env.sh"
 
 # ===== Help =====
 if [[ $# -eq 0 || "$1" == "--help" ]]; then

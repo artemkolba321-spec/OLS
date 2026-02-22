@@ -1,6 +1,6 @@
 # OLS global var
 export OLS_VERSION="0.3.1"
-
+ 
 # ===== Paths =====
 OLS_DIR="$HOME/OLS"
 LOG_FILE="$OLS_DIR/logs.log"

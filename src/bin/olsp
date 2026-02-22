@@ -5,7 +5,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-source "$HOME/OLS/lib/env.sh"
+source "$HOME/.local/OLS/lib/env.sh"
 
 # ===== Ensure plugins dir exists =====
 mkdir -p "$PLUGINS_DIR"
