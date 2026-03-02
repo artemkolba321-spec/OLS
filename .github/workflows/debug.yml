@@ -1,0 +1,26 @@
+name: "debug CI"
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bash syntax check (all shell scripts)
+        run: |
+          find src -type f | while read f; do
+            if head -n1 "$f" | grep -qE '^#!.*(bash|sh)'; then
+              echo "Checking syntax: $f"
+              bash -n "$f"
+            fi
+          done
+
+      - name: ShellCheck
+        run: |
+          shellcheck src/bin/* src/lib/*.sh
+
