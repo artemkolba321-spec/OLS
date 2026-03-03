@@ -1,5 +1,5 @@
 # OLS global var
-export OLS_VERSION="0.3.1"
+export OLS_VERSION="0.3.2"
  
 # ===== Paths =====
 OLS_DIR="$HOME/.local/share/OLS"
