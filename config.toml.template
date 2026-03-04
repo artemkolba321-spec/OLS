@@ -1,5 +1,0 @@
-[sources.olsp]
-Include = "https://github.com/artemkolba321-spec/OLSP"
-
-[uedit]
-program = "nano"
