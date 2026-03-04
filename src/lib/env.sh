@@ -1,5 +1,5 @@
 # OLS global var
-export OLS_VERSION="0.3.2"
+export OLS_VERSION="0.3.3"
  
 # ===== Paths =====
 OLS_DIR="$HOME/.local/share/OLS"
@@ -15,5 +15,6 @@ warn() {
 
 ee() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS]["$(basename $0)"][EE] $@" >> "$LOG_FILE"
+    exit 1
 }
 

@@ -5,7 +5,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-LOG_FILE="$HOME/.local/OLS/logs.log"
+LOG_FILE="$HOME/.local/share/OLS/logs.log"
 
 # ===== Help =====
 show_help() {
