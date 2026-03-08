@@ -18,7 +18,7 @@ jobs:
 
       - name: Prepare release archive
         run: |
-          tar -czf OLS-${{ github.ref_name }}.tar.gz src makefile README.md LICENSE
+          tar -czf OLS-${{ github.ref_name }}.tar.gz src Makefile README.md LICENSE
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
