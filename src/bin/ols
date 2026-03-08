@@ -25,6 +25,78 @@ interactive:
 EOF
 }
 
+ols_update() {
+
+    FORCE=false
+    CHECK=false
+
+    for arg in "$@"; do
+        case "$arg" in
+            --check) CHECK=true ;;
+            --force) FORCE=true ;;
+            "") ;;
+            *) echo "Unknown option: $arg"; return 1 ;;
+        esac
+    done
+
+    CURRENT=$(cat "$OLS_DIR/.version" 2>/dev/null || echo "0.0.0")
+
+    LATEST_TAG=$(curl -fsSL "https://api.github.com/repos/artemkolba321-spec/OLS/releases/latest" \
+                 | grep '"tag_name":' | cut -d '"' -f4)
+    if [[ -z "$LATEST_TAG" ]]; then
+        echo "Cannot fetch latest release."
+        return 1
+    fi
+    LATEST="${LATEST_TAG#v}"
+
+    # ===== CHECK ONLY =====
+    if [[ "$CHECK" == true ]]; then
+        if [[ "$LATEST" == "$CURRENT" ]]; then
+            echo "OLS is up to date ($CURRENT)"
+        else
+            echo "Update available: $CURRENT → $LATEST"
+        fi
+        return
+    fi
+
+    # ===== NORMAL UPDATE CHECK =====
+    if [[ "$FORCE" == false && "$LATEST" == "$CURRENT" ]]; then
+        echo "Already up to date ($CURRENT)"
+        return
+    fi
+
+    # ===== UPDATE =====
+    if [[ "$FORCE" == true ]]; then
+        echo "Force reinstalling OLS $LATEST"
+    else
+        echo "Updating OLS: $CURRENT → $LATEST"
+    fi
+
+    TMP="/tmp/ols"
+    rm -rf "$TMP"
+    mkdir -p "$TMP"
+
+    echo "Downloading release..."
+    curl -L -o "$TMP/ols.tar.gz" \
+        "https://github.com/artemkolba321-spec/OLS/archive/refs/tags/$LATEST_TAG.tar.gz" \
+        || { echo "Download failed."; return 1; }
+
+    echo "Extracting..."
+    tar -xzf "$TMP/ols.tar.gz" -C "$TMP" || { echo "Extraction failed."; return 1; }
+
+    SRC=$(find "$TMP" -maxdepth 1 -type d -name "OLS-*")
+    [[ -z "$SRC" ]] && { echo "Cannot find extracted source."; return 1; }
+
+    echo "Reinstalling OLS..."
+    cd "$SRC" || return 1
+    make reinstall || { echo "Reinstall failed."; return 1; }
+
+    echo "$LATEST" > "$OLS_DIR/.version"
+    echo "OLS updated to $LATEST"
+
+    rm -rf "$TMP"
+}
+
 # ===== Doctor =====
 ols_doctor() {
     echo "OLS Doctor report"
@@ -193,6 +265,10 @@ case "${1-}" in
         ;;
     doctor)
         ols_doctor
+        ;;
+    update)
+        shift
+        ols_update "${@-}"
         ;;
     "")
         interactive_shell
