@@ -19,7 +19,6 @@ install:
 	@echo "Installing OLS to $(OLS_DIR)"
 	@install -d $(BIN) $(LIB) $(SBIN) $(PLUG) $(ASSETS)
 	@touch $(LOGS)
-	@cp .version $(OLS_DIR)/ 
 	@cp -r $(SRC_BIN)/* $(BIN)/ 2>/dev/null || true
 	@cp -r $(SRC_LIB)/* $(LIB)/ 2>/dev/null || true
 	@cp -r $(SRC_ASSETS)/* $(ASSETS)/ 2>/dev/null || true
