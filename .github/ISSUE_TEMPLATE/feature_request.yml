@@ -1,20 +1,21 @@
-name: "Feature Request"
-description: "Submit a new feature idea for OLS"
-title: ""
+name: Feature request
+description: Suggest a new feature for OLS
+title: "[Feature]: "
 labels: ["enhancement"]
+
 body:
   - type: input
     id: title
     attributes:
-      label: "Title"
-      placeholder: "Short and descriptive feature title"
+      label: Title
+      placeholder: Short feature name
     validations:
       required: true
 
   - type: textarea
     id: description
     attributes:
-      label: "Description"
-      placeholder: "Describe the feature and why it would be useful"
+      label: Description
+      placeholder: Describe the feature
     validations:
       required: true
