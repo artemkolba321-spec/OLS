@@ -5,7 +5,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 source "$HOME/.local/share/OLS/lib/env.sh"
-
+BIN_DIR="$OLS_DIR/bin"
 
 # ===== Helpers =====
 show_help() {
