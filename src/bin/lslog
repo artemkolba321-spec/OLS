@@ -23,29 +23,34 @@ description:
 
 examples:
     lslog                    show all logs
-    lslog | grep EE          show only errors
-    lslog | grep gx          show only gx command logs
+    lslog | xget EE          show only errors
+    lslog | xget gx          show only gx command logs
     lslog | tail -20         show the last 20 log entries
     lslog | sort | uniq      show unique log entries
 EOF
 }
 
 
+if [[ $# -eq 0 || "$1" == "--help" ]]; then
+    show_help
+    info "help showed" 
+    exit 0
+fi
+
 # ===== Args =====
 case "${1-}" in
-    --help)
-        show_help
-        exit 0
-        ;;
     -G|--global)
         if command -v journalctl >/dev/null 2>&1; then
             journalctl -k
         else
             dmesg
         fi
+        exit 0
         ;;
     *)
-    cat "$LOG_FILE"
+        [[ ! -f "$LOG_FILE" ]] && panic "file logs.log not found"
+        cat "$LOG_FILE"
+        ;;
 esac
 
 

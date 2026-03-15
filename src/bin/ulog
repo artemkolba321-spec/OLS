@@ -4,7 +4,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-LOG_FILE="$HOME/.local/OLS/share/ogs.log"
+LOG_FILE="$HOME/.local/share/OLS/logs.log"
+source "$HOME/.local/share/OLS/lib/env.sh"
 
 die() {
     echo "ulog: $@" >&2
@@ -16,7 +17,7 @@ show_help() {
 usage:
     ulog list [pattern]
     ulog clear
-    ulog --mhelp
+    ulog --help
 
 description:
     ulog is a small utility for working with OLS logs.
@@ -38,19 +39,16 @@ examples:
     ulog list nurl
     ulog list EE
     ulog list | tail -n 20
-    ulog list | grep update
     ulog list | awk '{print $3}'
     ulog clear
 EOF
 }
 
 [[ $# -eq 0 ]] && show_help && exit 0
+[[ ! -f "$LOG_FILE" ]] && panic "file logs.log not found"
 
 case "$1" in
     list)
-        if [[ ! -f "$LOG_FILE" ]]; then
-            die "Log file not found: $LOG_FILE"
-        fi
 
         if [[ -n "${2-}" ]]; then
             grep -- "$2" "$LOG_FILE"

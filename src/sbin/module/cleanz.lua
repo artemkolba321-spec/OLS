@@ -7,7 +7,8 @@ if arg[1] == "log" then
     os.execute(': > ~/.local/share/OLS/logs.log')
     print("done!")
 elseif arg[1] == "tmp" then
-    os.execute('rm -rf /tmp/ols/*')
+    os.execute('mkdir -p ~/.cache/OLS')
+    os.execute('rm -rf ~/.cache/OLS/*')
     print("done!")
 else
     print("Unknown target: " .. arg[1])

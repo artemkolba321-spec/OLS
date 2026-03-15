@@ -246,7 +246,7 @@ interactive_shell() {
             doctor)
                 ols_doctor
                 ;;
-            import)
+            run)
                 if [[ -z "${args[0]-}" ]]; then
                     echo "Usage: import <module> [args...]"
                     continue
