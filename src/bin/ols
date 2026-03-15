@@ -27,7 +27,7 @@ EOF
 ols_update() {
 
     mode="update"
-    branch="lts"  # по умолчанию LTS
+    branch="lts"
 
     # ===== Parse options =====
     for arg in "$@"; do
@@ -42,8 +42,8 @@ ols_update() {
     # ===== Current version/ref =====
     CURRENT=$(cat "$OLS_DIR/.version" 2>/dev/null || echo "0.0.0")
     REPO="artemkolba321-spec/OLS"
-    TMP_DIR=$(mktemp -d)
     STATE_FILE="$HOME/.local/share/ols/state.json"
+
     mkdir -p "$(dirname "$STATE_FILE")"
 
     # ===== Determine latest ref =====
@@ -77,9 +77,12 @@ ols_update() {
         return 0
     fi
 
-    echo "Downloading OLS ($branch) $REF..."
+    TMP_BASE="$HOME/.cache/OLS/pkg"
+    TMP_DIR="$TMP_BASE/OLS-$REF"
+    mkdir -p "$TMP_DIR"
     ARCHIVE="$TMP_DIR/ols.tar.gz"
 
+    echo "Downloading OLS ($branch) $REF..."
     if [[ "$branch" == "lts" ]]; then
         curl -L "https://github.com/$REPO/archive/refs/tags/$REF.tar.gz" -o "$ARCHIVE" || { echo "Download failed"; rm -rf "$TMP_DIR"; return 1; }
     else
@@ -102,14 +105,13 @@ ols_update() {
     cp -r "$TAR_DIR/src/bin/"* "$OLS_DIR/bin/" 2>/dev/null || true
     cp -r "$TAR_DIR/src/lib/"* "$OLS_DIR/lib/" 2>/dev/null || true
     cp -r "$TAR_DIR/assets/"* "$OLS_DIR/assets/" 2>/dev/null || true
+    cp -r "$TAR_DIR/src/sbin/"* "$OLS_DIR/sbin/" 2>/dev/null || true
+
 
     # ===== Update state =====
     echo "{\"last_check\":$(date +%s),\"last_ref\":\"$REF\"}" > "$STATE_FILE"
 
     echo "OLS updated to $REF"
-
-    # ===== Cleanup =====
-    rm -rf "$TMP_DIR"
 }
 
 # ===== Doctor =====
@@ -255,7 +257,6 @@ interactive_shell() {
                 MODULE_DIR="$OLS_DIR/sbin/module"
                 FOUND=0
 
-                # Перебираем все Lua-файлы
                 for f in "$MODULE_DIR"/*.lua; do
                     filename=$(basename "$f" .lua)
                     if [[ "$filename" == "$MODULE_NAME" ]]; then
