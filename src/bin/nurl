@@ -43,7 +43,7 @@ case "$1" in
         ;;
     *)
         if [[ "$1" == http://* || "$1" == https://* ]]; then
-            wget "$1"
+            wget --show-progress "$1"
             info "fetch $1"
         else
             ee "invalid argument: $1"

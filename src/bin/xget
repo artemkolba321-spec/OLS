@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# OLS command: xget
+
+set -euo pipefail
+IFS=$'\n\t'
+
+source "$HOME/.local/share/OLS/lib/env.sh"
+
+# ===== Helpers =====
+show_help() {
+    cat <<'EOF'
+xget - updated grep
+
+usage: 
+    xget <file> <text>
+    <command> | xget <text>
+options:
+    -i          search without case
+examples:
+    lscpu | xget -i "amd"
+    lslog -G | xget "ERROR|WARN"
+EOF
+}
+
+if [[ $# -eq 0 || "$1" == "--help" ]]; then
+    show_help
+    info "help showed" 
+    exit 0
+fi
+
+
+ignore_case=false
+case "${1-}" in
+    -i)
+        ignore_case=true
+        pattern="${2-}"
+        file="${3-}"
+        ;;
+    *)
+        pattern="${1-}"
+        file="${2-}"
+        ;;
+esac
+
+if [[ -z "$pattern" ]]; then
+    ee "pattern required"
+    exit 1
+fi
+
+
+opts=('--color=auto')
+
+if $ignore_case; then
+    opts+=('-i')
+fi
+
+if [ -t 0 ]; then
+    if [[ -z "${file:-}" ]]; then
+        ee "file required"
+        exit 1
+    fi
+    grep "${opts[@]}" "$pattern" "$file"
+else
+    grep "${opts[@]}" "$pattern"
+fi
+
+info "found $pattern"

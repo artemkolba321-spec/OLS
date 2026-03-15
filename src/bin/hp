@@ -26,6 +26,7 @@ Available commands:
     targz        Create or extract .tar.gz archives
     uedit        Edit files with your preferred editor
     ulog         Log messages to the OLS log file
+    xget         Updated grep
     xsystem      Execute system commands with logging
 
 Examples:
