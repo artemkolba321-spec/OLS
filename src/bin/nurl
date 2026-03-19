@@ -14,14 +14,12 @@ nurl - Net URL Load (download files from the web)
 usage:
     nurl <URL>         Download a file from the given URL
     nurl --help        Show this help message
+    nurl -o <URL> <output>
 
 description:
     Downloads files from HTTP/HTTPS URLs using wget.
     The file is saved to the current directory.
     You can also pipe the output to other commands.
-
-requires:
-    wget
 
 examples:
     nurl https://example.com/file.zip         download a file
@@ -41,9 +39,17 @@ case "$1" in
         show_help
         exit 0
         ;;
+    -o)
+        if [[ "$2" == http://* || "$2" == https://* ]]; then
+            curl -Lko "$3" "$2"
+            info "Saved $2 -> $3"        
+        else
+            ee "invalid argument: $1"
+        fi
+        ;;
     *)
         if [[ "$1" == http://* || "$1" == https://* ]]; then
-            wget --show-progress "$1"
+            wget "$1"
             info "fetch $1"
         else
             ee "invalid argument: $1"
