@@ -19,7 +19,7 @@ Available commands:
     hp           Show help for any OLS command (this command)
     lslog        View OLS activity logs
     mkfile       Create files or directories
-    nurl         Download files from URLs (wget wrapper)
+    nurl         Download files from URLs
     ols          Start the OLS interactive shell
     olsp         OLS plugin manager
     open         Open files with the default application

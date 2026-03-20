@@ -315,6 +315,10 @@ case "${1-}" in
         rm -rf ~/.cache/OLS/*
         : > "$LOG_FILE"
         ;;
+    -e)
+        shift
+        eval "${@:2}"
+        ;;
     doctor)
         ols_doctor
         ;;

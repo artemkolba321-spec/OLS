@@ -60,6 +60,7 @@ case "$1" in
         : > "$LOG_FILE"
         echo "ulog: log file cleared"
         ;;
+    
     --help)
         show_help
         ;;

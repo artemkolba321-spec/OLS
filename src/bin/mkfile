@@ -14,6 +14,7 @@ mkfile - Create files and directories
 usage:
     mkfile -f <filename> [<filename>...]    Create one or more files
     mkfile -d <dirname> [<dirname>...]      Create one or more directories
+    mkfile -l <source> <link>               Create link
     mkfile --help                           Show this help message
 
 description:
@@ -24,6 +25,7 @@ description:
 options:
     -f         Create empty file(s) (fails if file already exists)
     -d         Create directory/directories (creates parents if needed)
+    -l         Create physical link
     --help     Show this help message
 
 examples:
@@ -57,7 +59,11 @@ case "$1" in
             touch "$file" || ee "Failed to create file $file"
             info "Created file: $file"
         done
-
+        ;;
+    -l)
+        SRC="$2"
+        LINK="$3"
+        ln -sf "$SRC" "$LINK"
         ;;
     *)
         ee "Invalid argument: $1"
