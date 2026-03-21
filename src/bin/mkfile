@@ -25,7 +25,7 @@ description:
 options:
     -f         Create empty file(s) (fails if file already exists)
     -d         Create directory/directories (creates parents if needed)
-    -l         Create physical link
+    -l         Create symbolic links (symlinks)
     --help     Show this help message
 
 examples:
