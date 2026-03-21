@@ -10,7 +10,7 @@ printf "This will modify your shell config. Continue? [y/N]: "
 read -r confirm
 confirm="${confirm:-N}"
 if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
-    echo "[OLS] Canceled"
+    echo "\n[OLS] Canceled"
     exit 0
 fi
 
