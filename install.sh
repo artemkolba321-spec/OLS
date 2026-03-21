@@ -36,7 +36,7 @@ wget -O "$ARCHIVE" "https://github.com/$REPO/archive/refs/tags/$LATEST_TAG.tar.g
 # ===== Extract =====
 echo "[OLS] Extracting..."
 tar -xzf "$ARCHIVE" -C "$TMP_DIR"
-cd "$TMP_DIR"/*/
+cd "$TMP_DIR"/*/ || { echo "[OLS] Failed to enter source directory"; exit 1; }
 
 # ===== Install =====
 echo "[OLS] Installing..."
