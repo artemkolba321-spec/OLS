@@ -8,7 +8,6 @@ echo "[OLS] Installing..."
 # ===== Confirm =====
 printf "This will modify your shell config. Continue? [y/N]: "
 read -r confirm
-confirm="${confirm:-N}"
 if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
     echo "\n[OLS] Canceled"
     exit 0
