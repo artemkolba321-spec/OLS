@@ -3,24 +3,10 @@
 OLS (Open Linux Shell) - This is a project aimed at improving the work with the terminal.
 
 ## installation
+```bash
+bash <(curl -sSL https://raw.githubusercontent.com/artemkolba321-spec/OLS/main/install.sh)
+```
 
-Download the .tar.gz archive from [GitHub Releases](https://github.com/artemkolba321-spec/OLS/releases) and go to it
-<br>
-next installation
-```Bash
-make
-```
-next add to end .bashrc or .zshrc
-```Bash
-export PATH="$HOME/.local/share/OLS/bin:$PATH"
-source "$HOME/.local/share/OLS/lib/env.sh"
-```
-Then reload your shell:
-```Bash
-source ~/.bashrc
-# or
-source ~/.zshrc
-```
 everything is ready
 ## philosophy
 1. **Everything must be logged**  

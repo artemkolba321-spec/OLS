@@ -40,7 +40,7 @@ cd "$TMP_DIR"/*/ || { echo "[OLS] Failed to enter source directory"; exit 1; }
 
 # ===== Install =====
 echo "[OLS] Installing..."
-make reinstall 
+make install 
 
 # ===== RC detection =====
 detect_rc_file() {
