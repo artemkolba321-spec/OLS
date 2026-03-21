@@ -26,3 +26,7 @@ jobs:
             echo "Checking Lua syntax: $f"
             lua -e "assert(loadfile('$f'))"
           done
+      - name: Install Ruff
+        run: pip install ruff
+      - name: Run Ruff
+        run: ruff check .
