@@ -44,7 +44,10 @@ examples:
 EOF
 }
 
-[[ $# -eq 0 ]] && show_help && exit 0
+if [[ $# -eq 0 || "$1" == "--help" ]]; then
+    show_help
+    exit 0
+fi
 [[ ! -f "$LOG_FILE" ]] && panic "file logs.log not found"
 
 case "$1" in

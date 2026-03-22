@@ -7,7 +7,7 @@ IFS=$'\n\t'
 source "$HOME/.local/share/OLS/lib/env.sh"
 
 # ===== Help =====
-if [[ $# -eq 0 || "$1" == "--help" ]]; then
+show_help() {
     cat <<'EOF'
 gx - Git exec (clone wrapper)
 
@@ -19,6 +19,9 @@ usage:
 description:
     Clones a GitHub repository. DOES NOT change directory.
 EOF
+}
+if [[ $# -eq 0 || "$1" == "--help" ]]; then
+    show_help
     exit 0
 fi
 

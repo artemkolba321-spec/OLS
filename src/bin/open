@@ -33,13 +33,11 @@ command -v xdg-open >/dev/null 2>&1 \
 # ===== Main =====
 info "exec: $@"
 
-[[ $# -eq 0 ]] && show_help && exit 1
-
+if [[ "$1" == "--help" ]]; then
+    show_help
+    exit 0
+fi
 case "$1" in
-    --help)
-        show_help
-        exit 0
-        ;;
     -c)
         [[ $# -lt 2 ]] && warn "missing target for -c"
         TARGET="$2"

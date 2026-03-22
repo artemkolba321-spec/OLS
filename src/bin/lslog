@@ -33,7 +33,6 @@ EOF
 
 if [[ "${1-}" == "--help" ]]; then
     show_help
-    info "help showed" 
     exit 0
 fi
 

@@ -30,16 +30,14 @@ EOF
 
 
 # ===== Args =====
-[[ $# -eq 0 ]] && show_help && exit 0
-command -v wget >/dev/null 2>&1 || warn "wget not found"
+if [[ $# -eq 0 || "${1-}" == "--help" ]]; then
+    show_help
+    exit 0
+ficommand -v wget >/dev/null 2>&1 || warn "wget not found"
 command -v curl >/dev/null 2>&1 || warn "wget not found"
 
 # ===== Main =====
 case "$1" in
-    --help)
-        show_help
-        exit 0
-        ;;
     -o)
         if [[ "$2" == http://* || "$2" == https://* ]]; then
             curl -Lko "$3" "$2"

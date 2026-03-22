@@ -37,7 +37,10 @@ EOF
 }
 
 # ===== Args =====
-[[ $# -eq 0 ]] && show_help && exit 0
+if [[ $# -eq 0 || "$1" == "--help" ]]; then
+    show_help
+    exit 0
+fi
 [[ -z "${2-}" ]] && warn "Missing filename or directory name" && exit 1
 
 if [[ "$1" == "--help" ]]; then

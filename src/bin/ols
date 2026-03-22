@@ -219,12 +219,13 @@ interactive_shell() {
         esac
     done
 }
-
+if [[ $# -eq 0 || "$1" == "--help" ]]; then
+    show_help
+    exit 0
+fi
 
 # ===== Main =====
 case "${1-}" in
-    --help)
-        show_help
         ;;
     --version)
         echo "$OLS_VERSION"
