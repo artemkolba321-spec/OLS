@@ -219,7 +219,7 @@ interactive_shell() {
         esac
     done
 }
-if [[ $# -eq 0 || "$1" == "--help" ]]; then
+if [[ "${1-}" == "--help" ]]; then
     show_help
     exit 0
 fi
