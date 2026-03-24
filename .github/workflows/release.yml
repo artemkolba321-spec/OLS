@@ -16,18 +16,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare release archive
+      - name: Get tag
+        id: tag
         run: |
-          tar -czf OLS-${{ github.ref_name }}.tar.gz \
-          src Makefile README.md LICENSE .version install.sh
+          TAG=${GITHUB_REF#refs/tags/}
+          echo "latest_tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Using tag: $TAG"
 
-          cat run_template.sh OLS-${{ github.ref_name }}.tar.gz > setup.run
-          chmod 755 setup.run
+      - name: Build archive and run-file
+        run: |
+          TAG=${{ steps.tag.outputs.latest_tag }}
+
+          tar -czf OLS-${TAG}.tar.gz src Makefile README.md LICENSE install.sh
+
+          cat run_template.sh OLS-${TAG}.tar.gz > setup.run
+          chmod +x setup.run
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: | 
-            OLS-${{ github.ref_name }}.tar.gz
+          files: |
             setup.run
+            OLS-${{ steps.tag.outputs.latest_tag }}.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
