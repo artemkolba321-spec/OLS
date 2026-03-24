@@ -21,7 +21,7 @@ jobs:
           tar -czf OLS-${{ github.ref_name }}.tar.gz src Makefile README.md LICENSE .version
 
           cat run_template.sh OLS-${{ github.ref_name }}.tar.gz > setup.run
-          chmod +x setup.run
+          chmod 755 setup.run
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
