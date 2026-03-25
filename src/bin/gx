@@ -12,9 +12,9 @@ show_help() {
 gx - Git exec (clone wrapper)
 
 usage:
-    gx <user>/<repo>       (GitHub username/repo)
-    gx <HTTPS>             (https://github.com/user/repo.git)
-    gx <SSH>               (git@github.com:user/repo.git)
+    gx <user>/<repo>
+    gx <HTTPS>
+    gx <SSH>
 
 description:
     Clones a GitHub repository. DOES NOT change directory.

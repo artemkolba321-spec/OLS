@@ -39,6 +39,7 @@ command -v curl >/dev/null 2>&1 || warn "wget not found"
 
 # ===== Main =====
 case "$1" in
+    
     -o)
         if [[ "$2" == http://* || "$2" == https://* ]]; then
             curl -Lko "$3" "$2"
