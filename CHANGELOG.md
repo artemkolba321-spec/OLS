@@ -7,6 +7,7 @@ All significant changes to the OLS project are documented here.
 - flag -l for `mkfile`
 - flag -o for `nurl`
 - flag -e for main manager
+- flag --LOG_LEVEL= for main manager
 - System modules added:
   - `netcli`
   - `cleanz`
