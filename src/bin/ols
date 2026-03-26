@@ -233,6 +233,10 @@ case "${1-}" in
     --version)
         echo "$OLS_VERSION"
         ;;
+    --LOG_LEVEL=*)
+        export LOG_LEVEL="${1#*=}"
+        shift
+        ;;
     clean)
         mkdir -p ~/.cache/OLS
         rm -rf ~/.cache/OLS/*
