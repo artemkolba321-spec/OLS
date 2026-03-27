@@ -230,7 +230,7 @@ case "${1-}" in
         ols_update "${@-}"
         ;;
     
-    "")
+    ""|" ")
         interactive_shell
         ;;
     *.ols)
