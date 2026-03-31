@@ -128,6 +128,7 @@ ols_doctor() {
     SYSTEM_DIRS=("$OLS_DIR" "$BIN_DIR")
     SYSTEM_FILES=("$LOG_FILE")
     DEPENDENCIES=(git wget bash tree realpath curl lua jq make openssl)
+    PY_DEPS=(textual)
 
     for dir in "${SYSTEM_DIRS[@]}"; do
         [[ -d "$dir" ]] && echo "[OK] Directory: $dir" || echo "[FAIL] Directory missing: $dir"
@@ -140,7 +141,10 @@ ols_doctor() {
     for cmd in "${DEPENDENCIES[@]}"; do
         command -v "$cmd" >/dev/null 2>&1 && echo "[OK] Command: $cmd" || echo "[FAIL] Command missing: $cmd"
     done
-
+    
+    for py in "${PY_DEPS[@]}"; do
+        python3 -c "import $py" >/dev/null 2>&1 && echo "[OK] python module: $py" || echo "[FAIL] python module not found: $py"
+    done
 }
 
 # ===== Interactive shell =====
