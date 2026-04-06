@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from textual.app import App, ComposeResult
+from textual.app import App
 from textual.widgets import Header, Static, TextArea
 from textual.binding import Binding
 from pathlib import Path
@@ -56,9 +56,7 @@ class UEditApp(App):
         await self.mount(self.footer_widget)
 
     def action_save(self) -> None:
-        """Сохраняем файл и показываем уведомление"""
         self.filepath.write_text(self.editor.text, encoding="utf-8")
-        # Обновляем футер с коротким сообщением
         self.footer_widget.update(f"Saved {self.filepath.name} — ^Q to Quit")
 
 if __name__ == "__main__":
