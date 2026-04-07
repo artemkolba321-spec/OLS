@@ -201,7 +201,11 @@ interactive_shell() {
         esac
     done
 }
+<<<<<<< Updated upstream
 if [[ "${1-}" == "--help" ]]; then
+=======
+if [[ "${1-}"  == "--help" ]]; then
+>>>>>>> Stashed changes
     show_help
     exit 0
 fi
