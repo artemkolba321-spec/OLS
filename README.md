@@ -5,6 +5,13 @@ OLS is a toolkit of CLI utilities designed to make terminal workflows more predi
 > OLS is an early-stage MVP.
 > Expect breaking changes. We're exploring ideas and looking for contributors.
 
+## installation
+```bash
+bash <(curl -sSL https://raw.githubusercontent.com/artemkolba321-spec/OLS/main/install.sh)
+```
+
+everything is ready
+
 ## philosophy
 1. **Everything must be logged**  
    - All actions are recorded, making it easy to spot errors (EE) and trace what happened.
@@ -23,9 +30,3 @@ OLS is a toolkit of CLI utilities designed to make terminal workflows more predi
    - predictability
    - the user learns once
 
-## installation
-```bash
-bash <(curl -sSL https://raw.githubusercontent.com/artemkolba321-spec/OLS/main/install.sh)
-```
-
-everything is ready
