@@ -7,7 +7,7 @@ OLS is a toolkit of CLI utilities designed to make terminal workflows more predi
 
 ## installation
 ```bash
-curl -sSL https://raw.githubusercontent.com/artemkolba321-spec/OLS/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Tipix-dev/OLS/main/install.sh | bash
 ```
 
 everything is ready
