@@ -7,6 +7,7 @@ All significant changes to the OLS project are documented here.
 - new system modules:
   - `sysd`
 - binary plugins (`"bin": true`)
+- Sticky bit for Makefile
 
 ## [0.5.0] - 2026-04-02
 ### Added
