@@ -45,7 +45,7 @@ case "$1" in
             curl -Lko "$3" "$2"
             info "Saved $2 -> $3"        
         else
-            ee "invalid argument: $1"
+            ee "invalid argument: $2"
         fi
         ;;
     *)

@@ -224,7 +224,7 @@ case "${1-}" in
         ;;
     -e)
         shift
-        bash -c "$@"
+        bash -c "$2"
         ;;
     doctor)
         ols_doctor

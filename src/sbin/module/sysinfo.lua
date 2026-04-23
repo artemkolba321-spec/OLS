@@ -11,6 +11,8 @@ elseif arg[1] == "disk" then
     os.execute("df -h")
 elseif arg[1] == "la" then
     os.execute("uptime")
+elseif arg[1] == "inode" then
+    os.execute('df -i')
 else
     print("Unknown target: " .. arg[1])
 end
