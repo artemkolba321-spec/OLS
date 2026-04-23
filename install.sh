@@ -5,7 +5,7 @@ IFS=$'\n\t'
 REPO="artemkolba321-spec/OLS"
 echo "[OLS] Installing..."
 AUTO_YES=false
-if [[ "${1-}" == "-y" ]]; then
+if [[ "${1-}" == "-y" || ${1-} == "-yes" ]]; then
     AUTO_YES=true
 fi
 # ===== Confirm =====
@@ -15,7 +15,7 @@ else
     read -rp "This will modify your shell config. Continue? [y/N]: " confirm < /dev/tty
 fi
 if [[ "$confirm" != "y" && "$confirm" != "Y"  ]]; then
-    
+
     echo
     echo "[OLS] Canceled"
     exit 0
@@ -47,7 +47,7 @@ cd "$TMP_DIR"/*/ || { echo "[OLS] Failed to enter source directory"; exit 1; }
 
 # ===== Install =====
 echo "[OLS] Installing..."
-make install 
+make install
 
 # ===== RC detection =====
 detect_rc_file() {

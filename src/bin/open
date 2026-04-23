@@ -28,7 +28,7 @@ EOF
 }
 # ===== Requirements =====
 command -v xdg-open >/dev/null 2>&1 \
-    || ee "xdg-open not found (required)"
+    || ee "xdg-open not found"
 
 # ===== Main =====
 info "exec: $@"

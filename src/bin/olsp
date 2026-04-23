@@ -1,4 +1,4 @@
-#!/usr/bin/env 
+#!/usr/bin/env bash
 # OLS command: olsp
 
 set -euo pipefail
@@ -30,18 +30,18 @@ EOF
 
         SECRET="$(head /dev/urandom | tr -dc 0-9 A-Z a-z | head -c 135)"
         PUB="$(head /dev/urandom | tr -dc 0-9 | head -c 10)"
-        
+
         mkdir -p keys
         touch keys/$PLUGIN_NAME.pub
         touch keys/$PLUGIN_NAME.key
-        
+
         echo "$PUB" > "keys/$PLUGIN_NAME.pub"
         echo "$SECRET" > "keys/$PLUGIN_NAME.key"
 
         cat > .gitignore <<EOF
 keys/$PLUGIN_NAME.key
 EOF
-        
+
 
         # create template plugin.lua
         cat > plugin.lua <<'EOF'

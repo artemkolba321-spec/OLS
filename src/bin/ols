@@ -24,7 +24,7 @@ interactive:
     help             - show this help
     exit             - exit OLS
     PATH             - show PATH or OLS tree
-    doctor           - run diagnostics 
+    doctor           - run diagnostics
     <command> [args] - run system or plugin command
 EOF
 }
@@ -141,7 +141,7 @@ ols_doctor() {
     for cmd in "${DEPENDENCIES[@]}"; do
         command -v "$cmd" >/dev/null 2>&1 && echo "[OK] Command: $cmd" || echo "[FAIL] Command missing: $cmd"
     done
-    
+
     for py in "${PY_DEPS[@]}"; do
         python3 -c "import $py" >/dev/null 2>&1 && echo "[OK] python module: $py" || echo "[FAIL] python module not found: $py"
     done
@@ -217,10 +217,10 @@ case "${1-}" in
         echo "$LOG_LEVEL" > "$OLS_DIR/.loglevel"
         shift
         ;;
-        
+
     clean)
-        mkdir -p ~/.cache/OLS
-        rm -rf ~/.cache/OLS/*
+        mkdir -p "$HOME/.cache/OLS"
+        rm -rf "$HOME/.cache/OLS/"*
         ;;
     -e)
         shift
@@ -233,7 +233,7 @@ case "${1-}" in
         shift
         ols_update "${@-}"
         ;;
-    
+
     ""|" ")
         interactive_shell
         ;;
@@ -254,4 +254,3 @@ case "${1-}" in
         ee "Unknown command: $1"
         ;;
 esac
-
