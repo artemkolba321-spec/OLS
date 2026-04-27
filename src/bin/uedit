@@ -11,6 +11,6 @@ if [[ $# -eq 0 ]]; then
 fi
 
 echo "Opening $FILE with UEdit..."
-python3 "$OLS_DIR/lib/UEdit/main.py" "$FILE"
+python3 "$OLS_DIR/sbin/UEdit/main.py" "$FILE"
 
 echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][uedit][INFO] Edited $FILE using UEdit" >> "$LOG_FILE"
