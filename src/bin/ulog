@@ -16,7 +16,7 @@ show_help() {
 usage:
     ulog list [pattern]
     ulog clear
-    ulog help
+    ulog --mhelp
 
 description:
     ulog is a small utility for working with OLS logs.

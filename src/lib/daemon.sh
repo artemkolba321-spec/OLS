@@ -16,7 +16,7 @@ CHECK_INTERVAL=60   # seconds
 
 # ===== Logging =====
 ols_log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][daemon] $*" >> "$LOG_FILE"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [OLS][daemon] $@" >> "$LOG_FILE"
 }
 
 # ===== Single instance guard =====
@@ -31,13 +31,6 @@ fi
 echo "$$" > "$PID_FILE"
 trap 'rm -f "$PID_FILE"; exit 0' INT TERM EXIT
 
-# ===== Network check =====
-network_ok() {
-    ping -c1 -W1 8.8.8.8 >/dev/null 2>&1
-}
-
-# ===== Initial state =====
-mkdir -p "$LIB_DIR"
 touch "$STATE_FILE"
 
 ols_log "daemon started (pid=$$)"

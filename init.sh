@@ -80,6 +80,9 @@ for cmd in "$PWD/src/bin/"*; do
     base="$(basename "$cmd")"
     cp "$cmd" "$OLS_BIN/$base"
     chmod 755 "$OLS_BIN/$base"
+    echo "Installed bin: $base"
+    ols_log "Installed bin: $base"
+    
 done
 
 # ===== Install lib files =====
