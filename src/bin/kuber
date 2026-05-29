@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# OLS command: kuber
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# shellcheck source=src/lib/env.sh
+source "$HOME/.local/share/OLS/lib/env.sh"
+
+show_help() {
+    cat <<'EOF'
+usage:
+    kuber deploy                  # deploy app
+    kuber switch <namespace>      # switch to namespace
+    kuber ns <action> <namespace> # setting namespace
+EOF
+}
+
+command -v kubectl 2>&1 || warn "kubectl not found"
+command -v minikube 2>&1 || warn "minikube not found"
+
+if [[ "${1-}" == "--help" ]]; then
+    show_help
+    exit 0
+fi
+
+case "${1-}" in
+    deploy)
+        kubectl apply -f .
+        ;;
+    switch)
+        if [[ -z "${2-}" ]]; then
+            kubectl config set-context --current --namespace=${2-}
+        else
+            echo "Invalid Argument"
+            ee "Invalid argument"
+        fi
+        ;;
+    ns)
+        case "${2-}" in
+            add)
+                if [[ -z "${3-}" ]]; then
+                    kubectl create namespace ${3-}
+                else
+                    echo "Invalid Argument"
+                    ee "Invalid argument"
+                fi
+                ;;
+            rm)
+                if [[ -z "${3-}" ]]; then
+                    kubectl delete namespace ${3-}
+                else
+                    echo "Invalid Argument"
+                    ee "Invalid argument"
+                fi
+                ;;
+        esac
+        ;;
+    *)
+        ee "Invalid argument"
+        ;;
+esac

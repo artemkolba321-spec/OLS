@@ -69,4 +69,7 @@ EOF
         echo "✔ CI/CD created at .github/workflows/ci.yml"
         info "✔ CI/CD created stack=$STACK"
         ;;
+    *)
+        ee "Invalid argument"
+        ;;
 esac

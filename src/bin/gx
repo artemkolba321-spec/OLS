@@ -14,6 +14,7 @@ gx - Git exec (clone wrapper)
 
 usage:
     gx <user>/<repo>
+    gx <SSH>
     gx <HTTPS>
 
 description:

@@ -1,7 +1,7 @@
 <h1 align="center">OLS (Open Linux Shell)</h1>
 
 ![OLS Banner](assets/banner.svg)<br>
-OLS is a toolkit of CLI utilities designed to make terminal workflows more predictable, logged, and pipeline-friendly.
+OLS is a toolset for DevOps of CLI utilities designed to make terminal workflows more predictable, logged, and pipeline-friendly.
 > OLS is an early-stage MVP.
 > Expect breaking changes. We're exploring ideas and looking for contributors.
 
