@@ -16,7 +16,7 @@ usage:
 EOF
 }
 
-command -v kubectl 2>&1 || warn "kubectl not found"
+command -v kubectl 2>&1 || ee "kubectl not found"
 command -v minikube 2>&1 || warn "minikube not found"
 
 if [[ "${1-}" == "--help" ]]; then
@@ -29,8 +29,8 @@ case "${1-}" in
         kubectl apply -f .
         ;;
     switch)
-        if [[ -z "${2-}" ]]; then
-            kubectl config set-context --current --namespace=${2-}
+        if [[ -n "${2-}" ]]; then
+            kubectl config set-context --current --namespace="${2-}"
         else
             echo "Invalid Argument"
             ee "Invalid argument"
@@ -39,16 +39,16 @@ case "${1-}" in
     ns)
         case "${2-}" in
             add)
-                if [[ -z "${3-}" ]]; then
-                    kubectl create namespace ${3-}
+                if [[ -n "${3-}" ]]; then
+                    kubectl create namespace "${3-}"
                 else
                     echo "Invalid Argument"
                     ee "Invalid argument"
                 fi
                 ;;
             rm)
-                if [[ -z "${3-}" ]]; then
-                    kubectl delete namespace ${3-}
+                if [[ -n "${3-}" ]]; then
+                    kubectl delete namespace "${3-}"
                 else
                     echo "Invalid Argument"
                     ee "Invalid argument"

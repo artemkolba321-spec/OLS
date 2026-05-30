@@ -2,6 +2,11 @@
 
 All significant changes to the OLS project are documented here.
 
+## [unrealized]
+- new commands:
+  - `kuber`
+  - `ossh`
+
 ## [0.6.0] - 2024-05-18
 ### Added
 - SSH for `gx`
