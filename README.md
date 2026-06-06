@@ -1,9 +1,30 @@
 <h1 align="center">OLS (Open Linux Shell)</h1>
 
 ![OLS Banner](assets/banner.svg)<br>
-OLS is a toolset for DevOps of CLI utilities designed to make terminal workflows more predictable, logged, and pipeline-friendly.
+OLS is a DevOps-focused CLI toolkit that turns common multi-step workflows into single predictable commands with logging.
 > OLS is an early-stage MVP.
 > Expect breaking changes. We're exploring ideas and looking for contributors.
+
+## Why OLS
+
+- reduces repetitive DevOps workflows into single commands
+- standardizes logging across tools
+- makes CLI workflows reproducible and predictable
+
+## Demo
+no OLS
+```bash
+kubectl apply -f . -R
+mkdir -p .github/workflows
+nano .github/workflows/ci.yml
+cp server.js server.js.bak
+```
+OLS style
+```bash
+kuber deploy
+cicd init
+bak server.js 
+```
 
 ## installation
 ### Standard install

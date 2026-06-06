@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# OLS command: bak
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# shellcheck source=src/lib/env.sh
+source "$HOME/.local/share/OLS/lib/env.sh"
+
+show_help() {
+    cat <<'EOF'
+bak - backuping
+usage: bak <src>
+    bak server.js
+    bak Data.db
+EOF
+}
+if [[ "${1-}" == "--help" ]]; then
+    show_help
+    exit 0
+fi
+
+if [[ -n "${1-}" ]]; then
+    mkdir -p "backup"
+    cp "${1-}" "backup/${1-}.bak"
+else
+    echo "Invalid Argument"
+    ee "Invalid argument"
+fi

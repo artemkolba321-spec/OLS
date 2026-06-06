@@ -14,7 +14,7 @@ usage:
     ossh keygen        # generate ssh key
 EOF
 }
-command -v ssh 2>&1 || ee "ssh not found"
+command -v ssh >/dev/null 2>&1 || ee "ssh not found"
 if [[ "${1-}" == "--help" ]]; then
     show_help
     exit 0

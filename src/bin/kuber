@@ -9,6 +9,7 @@ source "$HOME/.local/share/OLS/lib/env.sh"
 
 show_help() {
     cat <<'EOF'
+kuber - k8s setting
 usage:
     kuber deploy                  # deploy app
     kuber switch <namespace>      # switch to namespace
@@ -16,8 +17,8 @@ usage:
 EOF
 }
 
-command -v kubectl 2>&1 || ee "kubectl not found"
-command -v minikube 2>&1 || warn "minikube not found"
+command -v kubectl >/dev/null 2>&1 || ee "kubectl not found"
+command -v minikube >/dev/null 2>&1 || warn "minikube not found"
 
 if [[ "${1-}" == "--help" ]]; then
     show_help
@@ -26,7 +27,7 @@ fi
 
 case "${1-}" in
     deploy)
-        kubectl apply -f .
+        kubectl apply -f . -R
         ;;
     switch)
         if [[ -n "${2-}" ]]; then
@@ -56,6 +57,7 @@ case "${1-}" in
                 ;;
         esac
         ;;
+
     *)
         ee "Invalid argument"
         ;;
