@@ -29,8 +29,8 @@ case "${1-}" in
 }
 EOF
 
-    SECRET=$(tr -dc '[:alnum:]' < /dev/urandom | head -c 135)
-    PUB=$(tr -dc '[:alnum:]' < /dev/urandom | head -c 10)
+    SECRET="$(openssl rand -hex 64)"
+    PUB="$(openssl rand -hex 32)"
 
         mkdir -p keys
         touch "keys/$PLUGIN_NAME.pub"
